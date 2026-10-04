@@ -1,0 +1,2999 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>听听就会</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',sans-serif;background:linear-gradient(135deg,#e8f0fe 0%,#dce7f5 50%,#e9eef7 100%);color:#1a2b3e;user-select:none;-webkit-user-select:none;position:fixed;inset:0;}
+body.dark{background:linear-gradient(135deg,#0f1720,#1a2535);color:#d8e3f0;}
+body.dark .card,body.dark .topbar,body.dark .book-card,body.dark .group-row,body.dark .wrow,body.dark .result-row,body.dark .search-result,body.dark .modal,body.dark .quiz-option,body.dark .stat,body.dark .word-detail-card{background:rgba(30,42,58,.92);color:#d8e3f0;border-color:#2d3e54;}
+body.dark .btn.ghost{background:rgba(40,55,75,.85);color:#c8d8ea;border-color:#3a4f68;}
+body.dark .seg{background:#1e2a3a;}
+body.dark .seg button{color:#8fa5bd;}
+body.dark .seg button.active{background:#2d4b6e;color:#fff;}
+body.dark textarea,body.dark input,body.dark select{background:#1a2535;color:#d8e3f0;border-color:#3a4f68;}
+body.dark .badge,body.dark .gnum,body.dark .progress-tag,body.dark .mini-prog{background:#1e2a3a;color:#8fa5bd;}
+body.dark .word-en,body.dark .wen,body.dark .sr-word,body.dark .gname,body.dark .bname{color:#e8f0fa;}
+body.dark .empty{color:#5a7088;}
+#app{position:absolute;inset:0;padding:env(safe-area-inset-top,10px) env(safe-area-inset-right,10px) env(safe-area-inset-bottom,10px) env(safe-area-inset-left,10px);display:flex;flex-direction:column;gap:10px;}
+.topbar{display:flex;flex-direction:column;gap:8px;padding:10px 14px;background:rgba(255,255,255,.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:22px;box-shadow:0 4px 18px rgba(0,30,60,.08),0 0 0 1px rgba(255,255,255,.8) inset;flex-shrink:0;}
+.topbar .row1{display:flex;align-items:center;gap:10px;}
+.topbar .title{font-size:18px;font-weight:700;color:#1e3a5f;white-space:nowrap;display:flex;align-items:center;gap:6px;flex:1;overflow:hidden;text-overflow:ellipsis;}
+.topbar .title small{font-size:11px;font-weight:500;color:#6b7f99;background:#eef3fa;padding:3px 9px;border-radius:20px;}
+.topbar .more-btn{flex-shrink:0;padding:9px 16px;border-radius:14px;font-size:15px;font-weight:700;color:#fff;background:#2d4b6e;border:none;cursor:pointer;box-shadow:0 6px 14px -6px rgba(45,75,110,.5);display:flex;align-items:center;gap:6px;white-space:nowrap;touch-action:manipulation;}
+.topbar .more-btn:active{transform:scale(.96);}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:10px 16px;border-radius:13px;font-size:14px;font-weight:600;color:#5a6f88;background:transparent;border:none;cursor:pointer;white-space:nowrap;transition:all .15s;touch-action:manipulation;flex-shrink:0;}
+.tab.active{background:#2d4b6e;color:#fff;box-shadow:0 4px 10px -4px rgba(45,75,110,.5);}
+.tab:active{transform:scale(.96);}
+.content{flex:1;position:relative;overflow:hidden;}
+.page{position:absolute;inset:0;display:none;flex-direction:column;gap:10px;overflow:hidden;}
+.page.active{display:flex;}
+.card{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:22px;padding:16px 18px;box-shadow:0 6px 20px -8px rgba(0,20,40,.12),0 0 0 1px rgba(255,255,255,.7) inset;display:flex;flex-direction:column;gap:10px;overflow:hidden;}
+.card-title{font-size:13px;font-weight:700;color:#5a6f88;text-transform:uppercase;letter-spacing:.05em;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:8px;}
+.badge{font-size:12px;background:#e6eef9;color:#2d4b6e;padding:4px 12px;border-radius:20px;font-weight:600;}
+.btn{border:none;border-radius:14px;padding:14px 20px;font-size:16px;font-weight:600;cursor:pointer;transition:all .12s;touch-action:manipulation;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:50px;font-family:inherit;line-height:1.2;text-align:center;white-space:nowrap;}
+.btn:active{transform:scale(.96);}
+.btn.primary{background:#2d4b6e;color:#fff;box-shadow:0 6px 14px -6px rgba(45,75,110,.5);}
+.btn.ghost{background:rgba(255,255,255,.9);color:#2d4b6e;border:1.5px solid #cfdcec;}
+.btn.danger{background:#fff2f2;color:#c04545;border:1.5px solid #f0c8c8;}
+.btn.success{background:#e3f4ea;color:#1b6b4c;border:1.5px solid #b3ddc7;}
+.btn.warn{background:#fff5e6;color:#a1662f;border:1.5px solid #f0d8b0;}
+.btn.sm{padding:9px 14px;font-size:14px;min-height:40px;border-radius:12px;}
+.btn.active-sort{background:#2d4b6e;color:#fff;border-color:#2d4b6e;}
+.seg{display:flex;background:#eef3fa;border-radius:14px;padding:4px;gap:4px;}
+.seg button{flex:1;border:none;background:transparent;padding:12px 6px;border-radius:11px;font-size:14px;font-weight:600;color:#5a6f88;cursor:pointer;transition:all .15s;font-family:inherit;touch-action:manipulation;line-height:1.2;text-align:center;white-space:nowrap;}
+.seg button.active{background:#fff;color:#1e3a5f;box-shadow:0 3px 8px rgba(0,0,0,.06);}
+#page-dictation .card.main{flex:1;justify-content:center;align-items:center;text-align:center;padding:22px;position:relative;overflow:hidden;}
+.word-en{font-size:clamp(32px,8vw,70px);font-weight:800;color:#1a2b3e;line-height:1.15;letter-spacing:-.02em;word-break:keep-all;overflow-wrap:normal;transition:filter .2s;cursor:pointer;}
+.word-zh{font-size:clamp(20px,5.5vw,42px);font-weight:700;color:#2d4b6e;margin-top:10px;word-break:normal;line-height:1.3;transition:filter .2s;}
+.word-phon{font-size:16px;color:#7a8fa8;margin-top:8px;font-weight:500;transition:filter .2s;}
+.word-freq{display:inline-block;margin-top:10px;background:linear-gradient(135deg,#ff6b35,#f7b731);color:#fff;font-weight:800;font-size:15px;padding:6px 16px;border-radius:30px;box-shadow:0 6px 14px -6px rgba(247,183,49,.6);}
+.hidden-txt{filter:blur(12px);opacity:.45;pointer-events:none;}
+.mask-en .wzh{filter:blur(12px);opacity:.4;}
+.mask-zh .wen{filter:blur(12px);opacity:.4;}
+.progress-tag{position:absolute;top:14px;left:14px;font-size:14px;color:#5a6f88;background:#eef3fa;padding:6px 14px;border-radius:20px;font-weight:600;}
+.pron-btn{position:absolute;top:14px;right:14px;width:54px;height:54px;border-radius:50%;background:#2d4b6e;color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 6px 16px -6px rgba(45,75,110,.6);transition:all .12s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;}
+.pron-btn:active{transform:scale(.92);}
+.controls{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+.controls .btn{flex:1;padding:12px 6px;font-size:14px;min-height:48px;}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;overflow-y:auto;padding:4px;}
+.book-card{background:linear-gradient(145deg,#fff,#f2f8ff);border-radius:18px;padding:16px;cursor:pointer;transition:all .15s;touch-action:manipulation;border:1.5px solid #e2ebf5;display:flex;flex-direction:column;gap:6px;min-height:110px;justify-content:space-between;}
+.book-card:active{transform:scale(.97);border-color:#2d4b6e;}
+.book-card .bname{font-size:17px;font-weight:700;color:#1e3a5f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.book-card .bmeta{font-size:12px;color:#7a8fa8;}
+.book-card .bprog{height:6px;background:#e6eef9;border-radius:6px;overflow:hidden;margin-top:6px;}
+.book-card .bprog i{display:block;height:100%;background:linear-gradient(90deg,#4a80b8,#2d4b6e);border-radius:6px;transition:width .3s;}
+.groups-list{display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding:2px;flex:1;-webkit-overflow-scrolling:touch;}
+.group-row{display:flex;align-items:center;gap:12px;padding:16px 18px;background:#fff;border-radius:16px;border:1.5px solid #e6eef9;cursor:pointer;transition:all .12s;touch-action:manipulation;}
+.group-row:active{background:#f2f8ff;}
+.group-row .gname{font-size:17px;font-weight:600;color:#1e3a5f;flex:1;word-break:keep-all;line-height:1.3;}
+.group-row .gnum{font-size:13px;color:#7a8fa8;background:#eef3fa;padding:4px 12px;border-radius:20px;flex-shrink:0;white-space:nowrap;}
+.group-row.selected{background:#e3f0fc;border-color:#2d4b6e;}
+.group-row .gcheck{width:24px;height:24px;border-radius:50%;border:2px solid #cfdcec;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0;}
+.group-row.selected .gcheck{background:#2d4b6e;border-color:#2d4b6e;}
+.wordlist{display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding:2px;flex:1;-webkit-overflow-scrolling:touch;}
+.wrow{display:flex;align-items:center;gap:12px;padding:16px 18px;background:#fff;border-radius:16px;border:1.5px solid #eef3fa;transition:all .12s;cursor:pointer;touch-action:manipulation;min-height:64px;}
+.wrow:active{background:#eef5ff;}
+.wrow .wen{font-size:18px;font-weight:700;color:#1e3a5f;flex-shrink:0;word-break:keep-all;line-height:1.2;transition:filter .2s;}
+.wrow .wfreq{font-size:12px;color:#ff6b35;font-weight:800;background:#fff5e6;padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap;}
+.wrow .wzh{font-size:15px;color:#5a6f88;flex:1;text-align:right;word-break:normal;line-height:1.3;transition:filter .2s;}
+.wrow.mark-wrong{background:#fffafa;border-color:#f5dada;}
+.wrow.mark-wrong .wen{color:#c04545;}
+.word-detail-card{background:#fff;border-radius:22px;padding:24px;border:1.5px solid #e6eef9;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;position:relative;}
+.wd-en{font-size:clamp(26px,7vw,34px);font-weight:800;color:#1e3a5f;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-right:50px;word-break:keep-all;line-height:1.2;cursor:pointer;transition:opacity .15s;}
+.wd-en:active{opacity:.6;}
+.wd-phon{font-size:16px;color:#7a8fa8;font-weight:500;}
+.wd-freq{font-size:14px;color:#fff;background:linear-gradient(135deg,#ff6b35,#f7b731);padding:5px 14px;border-radius:20px;font-weight:800;display:inline-block;align-self:flex-start;}
+.wd-zh{font-size:18px;color:#2d4b6e;font-weight:600;line-height:1.5;word-break:normal;}
+.wd-edit-btn{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;border:1.5px solid #cfdcec;background:#fff;font-size:18px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;color:#5a6f88;}
+.wd-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.wd-actions .btn{flex:1;min-width:90px;}
+.wd-section-title{font-size:13px;font-weight:700;color:#7a8fa8;text-transform:uppercase;letter-spacing:.05em;margin-top:6px;}
+.wd-example{background:#f6faff;border-radius:14px;padding:16px;border-left:4px solid #4a80b8;display:flex;flex-direction:column;gap:8px;}
+.wd-example .ex-en{font-size:16px;color:#1e3a5f;font-weight:600;line-height:1.7;word-break:normal;overflow-wrap:break-word;}
+.wd-example .ex-zh{font-size:14px;color:#6b7f99;line-height:1.6;}
+.wd-example .ex-en .clickable-word{cursor:pointer;padding:1px 2px;border-radius:4px;}
+.play-overlay{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(45,75,110,.95);color:#fff;padding:14px 22px;border-radius:20px;box-shadow:0 12px 30px -8px rgba(0,0,0,.4);display:none;align-items:center;gap:14px;z-index:150;min-width:300px;max-width:90vw;}
+.play-overlay.show{display:flex;}
+.play-overlay .po-info{flex:1;font-size:14px;font-weight:600;line-height:1.4;}
+.play-overlay .po-info small{display:block;font-size:12px;opacity:.85;margin-top:2px;}
+.play-overlay .po-btn{background:#fff;color:#2d4b6e;border:none;border-radius:12px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;}
+.mini-word-card{position:fixed;background:#fff;border-radius:14px;box-shadow:0 12px 30px -8px rgba(0,0,0,.3);padding:12px 16px;z-index:180;max-width:280px;font-size:14px;line-height:1.5;border:1.5px solid #e6eef9;}
+.mini-word-card .mc-en{font-weight:800;color:#1e3a5f;font-size:16px;white-space:nowrap;}
+.mini-word-card .mc-phon{color:#7a8fa8;font-size:13px;margin-top:2px;}
+.mini-word-card .mc-zh{color:#2d4b6e;font-weight:600;margin-top:6px;}
+.checkin-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.ci-day{aspect-ratio:1;border-radius:12px;background:#f0f5fc;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#8fa3bb;font-weight:600;border:1.5px solid transparent;}
+.ci-day.done{background:linear-gradient(145deg,#e3f4ea,#d0ecdd);color:#1b6b4c;border-color:#b3ddc7;}
+.ci-day.today{border-color:#2d4b6e;box-shadow:0 0 0 2px rgba(45,75,110,.15);}
+.ci-day .dnum{font-size:14px;font-weight:700;}
+.stat-row{display:flex;gap:10px;}
+.stat{flex:1;background:linear-gradient(145deg,#fff,#f2f8ff);border-radius:16px;padding:14px;border:1.5px solid #e6eef9;text-align:center;}
+.stat .snum{font-size:26px;font-weight:800;color:#2d4b6e;line-height:1.1;}
+.stat .slbl{font-size:11px;color:#7a8fa8;margin-top:4px;font-weight:600;}
+.search-result{background:#fff;border-radius:16px;padding:18px;border:1.5px solid #e6eef9;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1;}
+.sr-word{font-size:clamp(22px,6vw,28px);font-weight:800;color:#1e3a5f;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.sr-phon{font-size:16px;color:#7a8fa8;font-weight:500;margin-bottom:10px;}
+.sr-freq{font-size:13px;color:#fff;background:linear-gradient(135deg,#ff6b35,#f7b731);padding:4px 12px;border-radius:20px;font-weight:800;white-space:nowrap;}
+.sr-def{font-size:16px;color:#2d4b6e;font-weight:600;line-height:1.6;margin-bottom:12px;}
+.sr-ex{background:#f6faff;border-radius:12px;padding:14px;border-left:3px solid #4a80b8;display:flex;flex-direction:column;gap:6px;}
+.sr-ex .ex-en{font-size:15px;color:#1e3a5f;font-weight:600;line-height:1.6;}
+.sr-ex .ex-zh{font-size:14px;color:#6b7f99;line-height:1.5;}
+.modal-mask{position:fixed;inset:0;background:rgba(20,40,60,.45);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal-mask.show{display:flex;}
+.modal{background:#fff;border-radius:24px;padding:24px;max-width:680px;width:100%;max-height:88vh;display:flex;flex-direction:column;gap:14px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,20,40,.4);}
+.modal h3{font-size:19px;color:#1e3a5f;line-height:1.3;}
+.modal .modal-body{overflow-y:auto;display:flex;flex-direction:column;gap:12px;flex:1;-webkit-overflow-scrolling:touch;}
+.modal .modal-foot{display:flex;gap:8px;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:rgba(120,150,190,.3);border-radius:10px;}
+.empty{color:#a5b6c9;text-align:center;padding:30px 16px;font-size:15px;font-style:italic;}
+.mini-prog{height:6px;background:#e6eef9;border-radius:6px;overflow:hidden;}
+.mini-prog i{display:block;height:100%;background:linear-gradient(90deg,#4a80b8,#2d4b6e);border-radius:6px;transition:width .3s;}
+.game-cards{display:flex;flex-direction:column;gap:12px;flex:1;}
+.game-card{background:linear-gradient(145deg,#fff,#f2f8ff);border-radius:20px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;border:1.5px solid #e2ebf5;transition:all .15s;touch-action:manipulation;}
+.game-card:active{transform:scale(.98);}
+.game-card .gicon{font-size:44px;flex-shrink:0;}
+.game-card .gmeta{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;}
+.game-card .gname{font-size:18px;font-weight:800;color:#1e3a5f;line-height:1.2;white-space:nowrap;}
+.game-card .gdesc{font-size:13px;color:#7a8fa8;line-height:1.4;}
+.game-card.card-flip{background:linear-gradient(135deg,#a8d5ba,#5ea880);border:none;padding:26px 22px;min-height:140px;align-items:center;}
+.game-card.card-flip .gicon,.game-card.card-flip .gname,.game-card.card-flip .gdesc{color:#fff;}
+.game-card.card-flip .gicon{font-size:60px;}
+.game-card.card-flip .gname{font-size:22px;}
+.game-card.card-flip .gdesc{font-size:14px;color:rgba(255,255,255,.9);}
+.game-card-row{display:flex;gap:12px;flex:1;}
+.game-card.small{flex:1;flex-direction:column;align-items:flex-start;padding:20px 16px;min-height:130px;justify-content:center;}
+.game-card.small .gicon{font-size:40px;}
+.game-card.small .gname{font-size:17px;}
+.game-card.card-quiz{background:linear-gradient(135deg,#ffb88c,#ff8c42);border:none;}
+.game-card.card-quiz .gicon,.game-card.card-quiz .gname,.game-card.card-quiz .gdesc{color:#fff;}
+.game-card.card-tower{background:linear-gradient(135deg,#7fb0e8,#3a6fa8);border:none;}
+.game-card.card-tower .gicon,.game-card.card-tower .gname,.game-card.card-tower .gdesc{color:#fff;}
+.quiz-option{padding:18px;background:#fff;border-radius:16px;border:2px solid #e6eef9;font-size:17px;font-weight:600;color:#1e3a5f;text-align:center;cursor:pointer;transition:all .12s;touch-action:manipulation;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.quiz-option.correct{background:#e3f4ea;border-color:#3ea672;color:#1b6b4c;}
+.quiz-option.wrong{background:#fff2f2;border-color:#d9534f;color:#c04545;}
+.quiz-option:disabled{cursor:default;opacity:.8;}
+.result-list{display:flex;flex-direction:column;gap:6px;overflow-y:auto;padding:2px;flex:1;}
+.result-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-radius:12px;border:1.5px solid #eef3fa;cursor:pointer;}
+.result-row .ren{font-size:15px;font-weight:700;color:#1e3a5f;flex:1;}
+.result-row .rzh{font-size:14px;color:#5a6f88;flex:1;text-align:right;}
+.tower-enemy{position:absolute;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff6b35,#f7b731);color:#fff;font-weight:800;padding:14px 22px;border-radius:16px;box-shadow:0 8px 20px -8px rgba(255,107,53,.6);font-size:18px;white-space:nowrap;transition:top .2s linear;}
+.tower-hud{display:flex;justify-content:space-between;padding:8px 14px;background:rgba(255,255,255,.95);border-radius:14px;font-weight:800;font-size:15px;color:#1e3a5f;}
+@keyframes boom{0%{transform:translate(-50%,-50%) scale(.5);opacity:0;}50%{transform:translate(-50%,-50%) scale(1.4);opacity:1;}100%{transform:translate(-50%,-50%) scale(1.8);opacity:0;}}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(30,50,80,.92);color:#fff;padding:14px 26px;border-radius:30px;font-size:15px;font-weight:600;z-index:200;transition:transform .3s;pointer-events:none;backdrop-filter:blur(10px);max-width:80vw;text-align:center;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+.recycle-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border-radius:12px;border:1.5px solid #eef3fa;flex-wrap:wrap;}
+textarea,input[type=text],input[type=number],select{width:100%;border:1.5px solid #d5e0ee;border-radius:14px;padding:16px 18px;font-size:18px;font-family:inherit;color:#1a2b3e;background:#fbfdff;line-height:1.7;min-height:52px;}
+textarea{resize:vertical;min-height:160px;line-height:1.8;}
+.archive-hint{font-size:12px;color:#a5b6c9;margin-top:4px;padding-left:4px;}
+@media (max-width:600px){
+  #app{padding:6px;gap:6px;}
+  .topbar{padding:8px 10px;border-radius:16px;gap:6px;}
+  .topbar .title{font-size:15px;}
+  .topbar .title small{display:none;}
+  .topbar .more-btn{padding:8px 12px;font-size:13px;}
+  .tab{padding:8px 12px;font-size:12px;border-radius:11px;}
+  .card{padding:14px;border-radius:18px;}
+  .word-en{font-size:clamp(28px,9vw,46px);}
+  .word-zh{font-size:clamp(18px,6vw,32px);}
+  .controls .btn{padding:10px 4px;font-size:13px;min-height:46px;}
+  .books-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .modal{padding:18px;border-radius:20px;}
+  .wd-en{font-size:24px;padding-right:46px;}
+  .play-overlay{min-width:260px;padding:12px 18px;font-size:13px;}
+  .game-card.card-flip{padding:22px 16px;min-height:120px;}
+  .game-card.small{padding:16px 14px;min-height:110px;}
+  .game-card.small .gicon{font-size:34px;}
+  .game-card.small .gname{font-size:15px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="row1">
+      <div class="title">📚 <span id="bookTag">专升本500词</span></div>
+      <button class="more-btn" id="moreBtnTop">⚙️ 更多</button>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-page="dictation">听写</button>
+      <button class="tab" data-page="books">词书</button>
+      <button class="tab" data-page="game">刷词</button>
+      <button class="tab" data-page="review">复习</button>
+      <button class="tab" data-page="wrongbook">错题</button>
+      <button class="tab" data-page="search">查词</button>
+    </div>
+  </div>
+  <div class="content" id="contentArea">
+    <div class="page active" id="page-dictation">
+      <div class="card" style="flex:0 0 auto;padding:10px 14px;flex-direction:row;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="seg" id="viewSeg" style="flex:1;min-width:180px;">
+          <button data-view="both" class="active">中英</button>
+          <button data-view="en">英</button>
+          <button data-view="zh">中</button>
+        </div>
+        <button class="btn ghost sm" id="orderToggleBtn">➡️ 顺序</button>
+        <button class="btn ghost sm" id="reviewWordsBtn">📋 本组</button>
+        <button class="btn ghost sm" id="dictSettingsBtn">⚙️</button>
+      </div>
+      <div class="card main" id="dictMain">
+        <div class="progress-tag" id="progTag">0 / 0</div>
+        <button class="pron-btn" id="pronBtn">🔊</button>
+        <div class="word-en" id="wordEn">✨ 准备就绪</div>
+        <div class="word-zh" id="wordZh">选择分组开始听写</div>
+        <div class="word-phon" id="wordPhon"></div>
+        <div class="word-freq" id="wordFreq" style="display:none;">🔥 出现 0 次</div>
+      </div>
+      <div class="card" style="flex:0 0 auto;padding:10px 12px;flex-direction:row;gap:6px;flex-wrap:wrap;">
+        <button class="btn primary" id="playBtn" style="flex:1.5;">▶ 开始</button>
+        <button class="btn ghost" id="prevBtn">⏮</button>
+        <button class="btn ghost" id="nextBtn">⏭</button>
+        <button class="btn warn" id="wrongBtn">✗ 不熟</button>
+        <button class="btn success" id="starBtn">✓ 熟</button>
+      </div>
+      <div class="card" style="flex:0 0 auto;padding:8px 12px;">
+        <div class="card-title" style="margin-bottom:4px;">
+          <span>当前：<b id="curGroupName">未选择</b></span>
+          <span class="badge" id="curGroupBadge">0 词</span>
+        </div>
+        <div class="mini-prog"><i id="miniProg" style="width:0%"></i></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-books">
+      <div class="card" style="flex:1;">
+        <div class="card-title">
+          <span>📖 我的词书</span>
+          <span style="display:flex;gap:6px;">
+            <button class="btn ghost sm" id="recycleBtn">🗑️ 回收站</button>
+            <button class="btn primary sm" id="newBookBtn">+ 导入</button>
+          </span>
+        </div>
+        <div style="font-size:13px;color:#7a8fa8;padding:2px 4px;">👉 点开任意分组，即可开始听写和背词</div>
+        <div class="books-grid" id="booksGrid"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-game">
+      <div class="card" style="flex:1;overflow:hidden;">
+        <div class="card-title"><span>🎮 选择游戏</span></div>
+        <div class="game-cards">
+          <div class="game-card card-flip" data-mode="slide">
+            <div class="gicon">📖</div>
+            <div class="gmeta">
+              <div class="gname">卡片背词</div>
+              <div class="gdesc">卡片左右滑 · 判断认识 / 不认识</div>
+            </div>
+          </div>
+          <div class="game-card-row">
+            <div class="game-card small card-quiz" data-mode="quiz">
+              <div class="gicon">📝</div>
+              <div class="gmeta">
+                <div class="gname">词义挑战</div>
+                <div class="gdesc">4 选 1</div>
+              </div>
+            </div>
+            <div class="game-card small card-tower" data-mode="tower">
+              <div class="gicon">🛡️</div>
+              <div class="gmeta">
+                <div class="gname">单词堡垒</div>
+                <div class="gdesc">点炮塔</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap;">
+          <button class="btn ghost sm" id="soundToggleBtn">🔔 音效开</button>
+          <button class="btn ghost sm" id="gameSelectBtn">选择分组</button>
+          <span style="font-size:13px;color:#5a6f88;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="gameSelectedInfo">未选择（默认当前分组）</span>
+        </div>
+      </div>
+      <div class="card" style="flex:0 0 auto;">
+        <div class="card-title"><span>📊 上次结果</span><button class="btn ghost sm" id="clearResultBtn">清空</button></div>
+        <div style="display:flex;gap:10px;">
+          <div class="stat" style="cursor:pointer;" data-res="known">
+            <div class="snum" id="resKnown">0</div><div class="slbl">✅ 记得很熟</div>
+          </div>
+          <div class="stat" style="cursor:pointer;" data-res="unknown">
+            <div class="snum" id="resUnknown">0</div><div class="slbl">❌ 记得不熟</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-gameplay">
+      <div class="card" style="flex:0 0 auto;padding:8px 12px;flex-direction:row;align-items:center;gap:8px;">
+        <button class="btn ghost sm" id="gameExitBtn">← 退出</button>
+        <div style="flex:1;text-align:center;font-weight:700;color:#1e3a5f;font-size:15px;" id="gameTitle">游戏</div>
+        <div class="badge" id="gameScore">0 分</div>
+      </div>
+      <div class="card main" id="gameMain" style="flex:1;justify-content:center;align-items:center;text-align:center;padding:14px;position:relative;overflow:hidden;"></div>
+    </div>
+
+    <div class="page" id="page-gameresult">
+      <div class="card" style="flex:0 0 auto;padding:8px 12px;flex-direction:row;align-items:center;">
+        <button class="btn ghost sm" id="resultBackBtn">← 返回</button>
+        <div style="flex:1;text-align:center;font-weight:700;color:#1e3a5f;font-size:15px;">📊 游戏结束</div>
+      </div>
+      <div class="card" style="flex:0 0 auto;">
+        <div class="stat-row">
+          <div class="stat"><div class="snum" id="resultScore">0</div><div class="slbl">本次得分</div></div>
+          <div class="stat"><div class="snum" id="resultBest">0</div><div class="slbl">最高记录</div></div>
+          <div class="stat"><div class="snum" id="resultExtra">0</div><div class="slbl" id="resultExtraLabel">金币</div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn primary" id="playAgainBtn" style="flex:1;">🔄 再来一次</button>
+          <button class="btn ghost" id="exitGameBtn" style="flex:1;">退出</button>
+        </div>
+      </div>
+      <div class="card" style="flex:1;overflow:hidden;">
+        <div class="card-title"><span>✅ 记得很熟</span><span class="badge" id="resultKnownCount">0</span></div>
+        <div class="result-list" id="resultKnownList"></div>
+      </div>
+      <div class="card" style="flex:1;overflow:hidden;">
+        <div class="card-title"><span>❌ 记得不熟</span><span class="badge" id="resultUnknownCount">0</span></div>
+        <div class="result-list" id="resultUnknownList"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-review">
+      <div class="card" style="flex:0 0 auto;">
+        <div class="card-title">
+          <span>🔁 复习已打卡的分组</span>
+          <span class="badge" id="reviewCount">0 组</span>
+        </div>
+        <div style="font-size:13px;color:#7a8fa8;margin-bottom:6px;">可多选，合并听写</div>
+        <div class="groups-list" id="reviewGroups" style="max-height:240px;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn ghost sm" id="reviewAllBtn" style="flex:1;">全选</button>
+          <button class="btn ghost sm" id="reviewNoneBtn" style="flex:1;">清空</button>
+          <button class="btn primary sm" id="reviewStartBtn" style="flex:1.5;">▶ 开始复习</button>
+        </div>
+      </div>
+      <div class="card" style="flex:1;overflow:hidden;">
+        <div class="card-title"><span>📋 已选单词</span><span class="badge" id="reviewWordCount">0</span></div>
+        <div class="wordlist" id="reviewWordList"><div class="empty">选择分组后显示单词</div></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-wrongbook">
+      <div class="card" style="flex:1;overflow:hidden;">
+        <div class="card-title">
+          <span>📕 错题本 / 熟练本</span>
+          <span class="badge" id="wrongCount">0 词</span>
+        </div>
+        <div class="seg" id="wrongSeg" style="margin-bottom:10px;">
+          <button data-wt="wrong" class="active">❌ 不熟</button>
+          <button data-wt="star">✅ 熟练</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+          <button class="btn ghost sm" id="newFolderBtn">+ 新建夹</button>
+          <button class="btn ghost sm" id="askToggleBtn">⚙️ 标记时询问：关</button>
+        </div>
+        <div class="groups-list" id="wrongGroups"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-search">
+      <div class="card" style="flex:0 0 auto;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="searchInput" placeholder="输入英文单词查询…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <button class="btn primary" id="searchBtn">查</button>
+        </div>
+        <div style="font-size:12px;color:#a5b6c9;margin-top:6px;padding-left:2px;">💡 词书里的词秒出；词书外会联网查询（可能较慢）</div>
+      </div>
+      <div class="card" style="flex:1;padding:10px;overflow:hidden;">
+        <div class="search-result" id="searchResult">
+          <div class="empty">输入单词，查看音标、释义、例句、发音和考频</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-more">
+      <div class="card" style="flex:1;overflow-y:auto;">
+        <div class="card-title"><span>⚙️ 更多功能</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn ghost" id="moreCheckinBtn" style="justify-content:flex-start;">📅 打卡 & 学习报告</button>
+          <button class="btn ghost" id="moreArchiveBtn" style="justify-content:flex-start;">☁️ 存档管理</button>
+          <button class="btn ghost" id="moreExportWrongBtn" style="justify-content:flex-start;">📤 导出错题本</button>
+          <button class="btn ghost" id="moreThemeBtn" style="justify-content:flex-start;">🌙 深色模式</button>
+          <button class="btn ghost" id="moreAchieveBtn" style="justify-content:flex-start;">🏆 成就系统</button>
+          <button class="btn danger" id="moreResetBtn" style="justify-content:flex-start;">⚠️ 重置所有数据</button>
+        </div>
+        <div style="margin-top:20px;padding-top:14px;border-top:1px solid #eef3fa;text-align:center;">
+          <div style="font-size:13px;color:#5a6f88;font-weight:600;line-height:1.8;">
+            作者：yuna<br>
+            任何问题欢迎致信 2210225469@qq.com
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:#9aabbf;">v5.2 · 听听就会 · 数据保存在本机浏览器</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <h3 id="modalTitle">标题</h3>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const RAW = [
+["growth","增长","[ɡroʊθ]",56,"The rapid growth of the economy has created more job opportunities.","经济的快速增长创造了更多的就业机会。"],
+["influence","影响","[ˈɪnfluəns]",51,"Parents have a great influence on their children's character.","父母对孩子的性格有很大的影响。"],
+["stress","压力；强调","[stres]",50,"Many students feel great stress before the entrance examination.","许多学生在入学考试前感到很大的压力。"],
+["effect","影响；效果","[ɪˈfekt]",47,"The new policy had a positive effect on the local economy.","新政策对当地经济产生了积极的影响。"],
+["digital","数字的","[ˈdɪdʒɪtl]",46,"In the digital age, we can access information easily.","在数字时代，我们可以轻松获取信息。"],
+["value","价值","[ˈvæljuː]",45,"We should value the opportunity to study abroad.","我们应该珍惜出国留学的机会。"],
+["community","社区","[kəˈmjuːnəti]",45,"The community organized a clean-up activity last weekend.","社区上周末组织了一次清洁活动。"],
+["result","导致","[rɪˈzʌlt]",42,"Careless driving can result in serious accidents.","粗心驾驶可能导致严重的事故。"],
+["nature","自然；本质","[ˈneɪtʃər]",42,"We should live in harmony with nature.","我们应该与自然和谐相处。"],
+["suggest","提议；暗示","[səˈdʒest]",40,"I suggest that we should start early to avoid the traffic.","我提议我们应该早点出发以避开交通拥堵。"],
+["attitude","态度","[ˈætɪtuːd]",36,"A positive attitude is the key to success.","积极的态度是成功的关键。"],
+["address","地址","[əˈdres]",32,"Please write down your address on this form.","请在这张表格上写下你的地址。"],
+["comment","评论","[ˈkɑːment]",31,"The teacher made a helpful comment on my essay.","老师对我的文章做出了有用的评论。"],
+["available","可获得","[əˈveɪləbl]",31,"The book is available in the school library.","这本书在学校图书馆可以借到。"],
+["corporate","公司的","[ˈkɔːrpərət]",31,"He works in a large corporate office in the city center.","他在市中心一家大型公司办公室工作。"],
+["benefit","利益","[ˈbenɪfɪt]",30,"Regular exercise can benefit both your body and mind.","定期锻炼对你的身心都有好处。"],
+["practice","练习","[ˈpræktɪs]",29,"Practice makes perfect when learning a foreign language.","学习外语时，熟能生巧。"],
+["approach","方法","[əˈproʊtʃ]",28,"We need a new approach to solve this problem.","我们需要一种新的方法来解决这个问题。"],
+["recommendation","推荐","[ˌrekəmenˈdeɪʃn]",27,"I bought this dictionary on my teacher's recommendation.","我根据老师的推荐买了这本词典。"],
+["measure","测量","[ˈmeʒər]",27,"The government took measures to control the price of food.","政府采取措施控制食品价格。"],
+["experience","经验/经历","[ɪkˈspɪriəns]",25,"He has rich experience in teaching English.","他在英语教学方面有丰富的经验。"],
+["intend","打算","[ɪnˈtend]",24,"I intend to take the college entrance exam next year.","我打算明年参加高考。"],
+["balance","平衡","[ˈbæləns]",24,"It is important to keep a balance between study and rest.","在学习和休息之间保持平衡很重要。"],
+["suitable","适当的","[ˈsuːtəbl]",24,"This book is suitable for students who are weak in English.","这本书适合英语薄弱的学生。"],
+["concern","影响","[kənˈsɜːrn]",23,"The pollution problem concerns everyone in the city.","污染问题影响着城市里的每个人。"],
+["emotional","情绪的","[ɪˈmoʊʃənl]",23,"She became very emotional when she heard the good news.","听到这个好消息时，她变得非常激动。"],
+["insurance","保险","[ɪnˈʃʊrəns]",23,"Every student should have health insurance.","每个学生都应该有健康保险。"],
+["ambition","野心","[æmˈbɪʃn]",23,"His ambition is to become a famous doctor.","他的志向是成为一名著名的医生。"],
+["initiative","倡议/主动","[ɪˈnɪʃətɪv]",21,"The school launched an initiative to help poor students.","学校发起了一项帮助贫困学生的倡议。"],
+["analysis","分析","[əˈnæləsɪs]",21,"The analysis of the data took us three hours.","数据分析花了我们三个小时。"],
+["degree","程度，学位","[dɪˈɡriː]",21,"To some degree, hard work is more important than talent.","在某种程度上，努力比天赋更重要。"],
+["argument","论点","[ˈɑːrɡjumənt]",20,"His argument was supported by many facts.","他的论点得到了许多事实的支持。"],
+["department","部门","[dɪˈpɑːrtmənt]",20,"She works in the English department of the university.","她在大学的英语系工作。"],
+["employment","雇用","[ɪmˈplɔɪmənt]",20,"The government is trying to increase employment opportunities.","政府正在努力增加就业机会。"],
+["manufacture","生产，制造","[ˌmænjuˈfæktʃər]",20,"This factory manufactures cars for export.","这家工厂生产用于出口的汽车。"],
+["challenge","挑战","[ˈtʃælɪndʒ]",20,"Learning a new language is a big challenge for many people.","学习一门新语言对许多人来说是一个巨大的挑战。"],
+["range","范围/变化","[reɪndʒ]",20,"The price of the books ranges from 10 to 50 yuan.","这些书的价格从10元到50元不等。"],
+["unique","独一无二的","[juˈniːk]",20,"Everyone has a unique way of learning.","每个人都有独特的学习方式。"],
+["cause","引起","[kɔːz]",19,"Smoking can cause many health problems.","吸烟会引起许多健康问题。"],
+["consequence","结果","[ˈkɑːnsɪkwens]",19,"He was late, and as a consequence, he missed the bus.","他迟到了，结果错过了公交车。"],
+["scale","规模","[skeɪl]",19,"The project was carried out on a large scale.","这个项目是大规模进行的。"],
+["positive","积极的","[ˈpɑːzətɪv]",19,"We should keep a positive attitude towards life.","我们应该对生活保持积极的态度。"],
+["subject","主题，实验受体","[ˈsʌbdʒɪkt]",19,"English is my favorite subject at school.","英语是我在学校最喜欢的科目。"],
+["figure","人物","[ˈfɪɡjər]",19,"He is a famous figure in the history of China.","他是中国历史上的一位著名人物。"],
+["critical","关键的，批判的","[ˈkrɪtɪkl]",19,"This is a critical moment for our team.","这是我们团队的关键时刻。"],
+["genetic","基因的","[dʒəˈnetɪk]",18,"Genetic research has made great progress in recent years.","近年来基因研究取得了巨大进展。"],
+["presence","存在","[ˈprezns]",18,"The presence of the teacher made the students quiet.","老师在场使学生们安静下来。"],
+["advantage","优势","[ədˈvæntɪdʒ]",18,"Speaking English well gives you an advantage in job hunting.","英语说得好在求职中给你优势。"],
+["board","董事会","[bɔːrd]",18,"The board of directors made an important decision.","董事会做出了一个重要决定。"],
+["involve","包含","[ɪnˈvɑːlv]",18,"The job involves a lot of communication with others.","这份工作包含大量与他人的沟通。"],
+["favor","较喜欢；有利于","[ˈfeɪvər]",18,"I favor the plan because it is practical.","我倾向于这个计划，因为它很实用。"],
+["considerable","相当多的","[kənˈsɪdərəbl]",18,"He has spent a considerable amount of time on this project.","他在这项目上花了相当多的时间。"],
+["standard","标准","[ˈstændərd]",17,"We must meet the standard required by the company.","我们必须达到公司要求的标准。"],
+["stock","股份","[stɑːk]",17,"He bought some stock in a technology company.","他买了一家科技公司的一些股份。"],
+["term","学期；条款","[tɜːrm]",17,"We will have a final exam at the end of this term.","这学期末我们将进行期末考试。"],
+["executive","主管","[ɪɡˈzekjətɪv]",17,"She is a senior executive in a big company.","她是一家大公司的高级主管。"],
+["privacy","隐私","[ˈpraɪvəsi]",17,"We should respect other people's privacy.","我们应该尊重他人的隐私。"],
+["efficiency","效率","[ɪˈfɪʃnsi]",17,"Using a computer can improve our work efficiency.","使用电脑可以提高我们的工作效率。"],
+["inevitable","不可避免的","[ɪnˈevɪtəbl]",17,"Making mistakes is inevitable when learning something new.","学习新东西时犯错是不可避免的。"],
+["revenue","税收收入","[ˈrevənuː]",17,"The government's revenue comes mainly from taxes.","政府的收入主要来自税收。"],
+["implication","含义","[ˌɪmplɪˈkeɪʃn]",16,"The implication of his words was that he disagreed.","他话里的含义是他不同意。"],
+["threat","威胁","[θret]",16,"Pollution is a serious threat to our health.","污染是对我们健康的严重威胁。"],
+["communication","通讯","[kəˌmjuːnɪˈkeɪʃn]",16,"Good communication is important in teamwork.","良好的沟通在团队合作中很重要。"],
+["stand","站立；位于","[stænd]",16,"Please stand up when the teacher comes in.","老师进来时请起立。"],
+["religious","宗教的","[rɪˈlɪdʒəs]",16,"He has a strong religious belief.","他有强烈的宗教信仰。"],
+["shift","转移","[ʃɪft]",16,"The company decided to shift its focus to new markets.","公司决定将重心转移到新市场。"],
+["phenomenon","现象","[fəˈnɑːmɪnən]",16,"This is a common phenomenon among young people.","这是年轻人中常见的现象。"],
+["giant","商业巨头","[ˈdʒaɪənt]",16,"The company has grown into an industry giant.","这家公司已经成长为行业巨头。"],
+["agency","代理","[ˈeɪdʒənsi]",16,"She found a job through an employment agency.","她通过职业介绍所找到了一份工作。"],
+["humanity","人类","[hjuːˈmænəti]",16,"We should work together for the good of humanity.","我们应该为人类的利益而共同努力。"],
+["classical","古典经典的","[ˈklæsɪkl]",16,"She enjoys listening to classical music.","她喜欢听古典音乐。"],
+["popularity","流行度","[ˌpɑːpjuˈlærəti]",16,"The popularity of online shopping is increasing.","网上购物的流行度正在增加。"],
+["senior","高级的","[ˈsiːniər]",16,"He is a senior student in our school.","他是我们学校的高年级学生。"],
+["colleague","同事","[ˈkɑːliːɡ]",16,"I get along well with my colleagues.","我和同事们相处得很好。"],
+["promote","提高","[prəˈmoʊt]",16,"The company tries to promote its new products.","公司试图推广它的新产品。"],
+["former","前面的/前者","[ˈfɔːrmər]",16,"Of the two plans, I prefer the former.","在两个计划中，我更喜欢前者。"],
+["appeal","呼吁","[əˈpiːl]",15,"The government appealed to people to save water.","政府呼吁人们节约用水。"],
+["infrastructure","基础设施","[ˈɪnfrəstrʌktʃər]",15,"The city has improved its infrastructure in recent years.","近年来这座城市改善了基础设施。"],
+["respect","尊敬","[rɪˈspekt]",15,"We should respect our teachers and parents.","我们应该尊敬老师和父母。"],
+["cover","包含","[ˈkʌvər]",15,"The book covers many topics about history.","这本书包含许多关于历史的主题。"],
+["fundamental","基本的","[ˌfʌndəˈmentl]",15,"Reading is a fundamental skill for learning.","阅读是学习的一项基本技能。"],
+["commission","委员会","[kəˈmɪʃn]",15,"The commission is investigating the accident.","委员会正在调查这起事故。"],
+["background","背景","[ˈbækɡraʊnd]",15,"He has a strong academic background.","他有很强的学术背景。"],
+["climate","气候","[ˈklaɪmət]",15,"The climate here is suitable for growing rice.","这里的气候适合种植水稻。"],
+["failure","失败","[ˈfeɪljər]",15,"Failure is the mother of success.","失败是成功之母。"],
+["gamble","赌博","[ˈɡæmbl]",15,"He lost all his money by gambling.","他赌博输掉了所有的钱。"],
+["sensitive","敏感的","[ˈsensətɪv]",15,"She is very sensitive to other people's opinions.","她对别人的意见很敏感。"],
+["optimistic","乐观的","[ˌɑːptɪˈmɪstɪk]",15,"We should be optimistic about the future.","我们应该对未来保持乐观。"],
+["previous","以前的","[ˈpriːviəs]",14,"He had no previous experience in this field.","他以前在这个领域没有经验。"],
+["campaign","运动","[kæmˈpeɪn]",14,"The school launched a campaign against smoking.","学校发起了一场反吸烟运动。"],
+["amount","数量","[əˈmaʊnt]",14,"A large amount of money was spent on the project.","这个项目花费了大量的钱。"],
+["administration","管理","[ədˌmɪnɪˈstreɪʃn]",14,"The administration of the company is very efficient.","公司的管理非常高效。"],
+["conservative","保守的","[kənˈsɜːrvətɪv]",14,"He is conservative about spending money.","他在花钱方面很保守。"],
+["confidence","信心","[ˈkɑːnfɪdəns]",14,"She has great confidence in her English ability.","她对自己的英语能力很有信心。"],
+["automation","自动化","[ˌɔːtəˈmeɪʃn]",14,"Automation has replaced many manual jobs.","自动化已经取代了许多手工工作。"],
+["rather","更加","[ˈræðər]",14,"The problem is rather difficult to solve.","这个问题相当难解决。"],
+["feature","以为特点/特点","[ˈfiːtʃər]",14,"The main feature of this phone is its camera.","这款手机的主要特点是它的摄像头。"],
+["context","背景","[ˈkɑːntekst]",14,"We should understand the word in its context.","我们应该在语境中理解这个词。"],
+["principle","原则","[ˈprɪnsəpl]",14,"He is a man of principle.","他是一个有原则的人。"],
+["prove","证明是","[pruːv]",13,"The experiment proved that his theory was correct.","实验证明他的理论是正确的。"],
+["psychological","心理的","[ˌsaɪkəˈlɑːdʒɪkl]",13,"The accident caused him serious psychological problems.","这场事故给他造成了严重的心理问题。"],
+["institution","制度","[ˌɪnstɪˈtuːʃn]",13,"Marriage is an important social institution.","婚姻是一种重要的社会制度。"],
+["curiosity","好奇","[ˌkjʊriˈɑːsəti]",13,"Children have a natural curiosity about the world.","孩子们对世界有天然的好奇心。"],
+["instance","实例","[ˈɪnstəns]",13,"For instance, you can use a dictionary to learn new words.","例如，你可以用词典来学习新单词。"],
+["postal","邮政的","[ˈpoʊstl]",13,"The postal service in this area is very convenient.","这个地区的邮政服务非常方便。"],
+["appropriate","恰当的","[əˈproʊpriət]",13,"It is not appropriate to talk loudly in the library.","在图书馆大声说话是不恰当的。"],
+["carbon","碳","[ˈkɑːrbən]",13,"We should reduce carbon emissions to protect the environment.","我们应该减少碳排放以保护环境。"],
+["turn","变","[tɜːrn]",12,"The weather turned cold suddenly.","天气突然变冷了。"],
+["reliable","可靠的","[rɪˈlaɪəbl]",12,"He is a reliable friend.","他是一个可靠的朋友。"],
+["revival","复兴","[rɪˈvaɪvl]",12,"The revival of traditional culture is important.","传统文化的复兴很重要。"],
+["commercial","商业的","[kəˈmɜːrʃl]",12,"This is a commercial center of the city.","这是城市的商业中心。"],
+["content","内容","[ˈkɑːntent]",12,"The content of the book is very interesting.","这本书的内容非常有趣。"],
+["tolerance","宽容","[ˈtɑːlərəns]",12,"We should have tolerance for different opinions.","我们应该对不同意见持宽容态度。"],
+["advance","进步","[ədˈvæns]",12,"Science and technology advance rapidly.","科学技术进步迅速。"],
+["trial","试验，审判","[ˈtraɪəl]",12,"The new drug is still under trial.","这种新药仍在试验中。"],
+["voluntary","自愿的","[ˈvɑːlənteri]",12,"She does voluntary work in her free time.","她在空闲时间做志愿工作。"],
+["creativity","创造力","[ˌkriːeɪˈtɪvəti]",12,"Creativity is important for students.","创造力对学生来说很重要。"],
+["aspect","方面","[ˈæspekt]",12,"We should consider every aspect of the problem.","我们应该考虑问题的每个方面。"],
+["slavery","奴役","[ˈsleɪvəri]",12,"Slavery was abolished in the 19th century.","奴隶制在19世纪被废除。"],
+["advocate","支持者/支持","[ˈædvəkeɪt]",12,"He is an advocate of environmental protection.","他是环境保护的倡导者。"],
+["retailer","零售商","[ˈriːteɪlər]",12,"The retailer sells clothes at a low price.","这家零售商以低价出售衣服。"],
+["latest","最新的","[ˈleɪtɪst]",12,"Have you heard the latest news?","你听到最新的消息了吗？"],
+["reflect","反映出","[rɪˈflekt]",12,"His words reflect his true feelings.","他的话反映出他的真实感受。"],
+["radical","激进的","[ˈrædɪkl]",12,"He has radical views on education.","他对教育有激进的看法。"],
+["panel","专家组","[ˈpænl]",11,"A panel of experts discussed the problem.","一个专家组讨论了这个问题。"],
+["widespread","普遍的","[ˈwaɪdspred]",11,"The disease caused widespread concern.","这种疾病引起了广泛的关注。"],
+["sympathy","同情","[ˈsɪmpəθi]",11,"I have great sympathy for the poor.","我对穷人深表同情。"],
+["identify","确定；鉴定","[aɪˈdentɪfaɪ]",11,"Can you identify the man in the picture?","你能认出图片中的那个人吗？"],
+["variety","多样","[vəˈraɪəti]",11,"The shop sells a variety of goods.","这家商店出售各种商品。"],
+["objective","目的","[əbˈdʒektɪv]",11,"Our objective is to improve English.","我们的目的是提高英语。"],
+["desire","欲望","[dɪˈzaɪər]",11,"He has a strong desire to succeed.","他有强烈的成功欲望。"],
+["illustrate","阐明","[ˈɪləstreɪt]",11,"The teacher illustrated his point with an example.","老师用例子阐明了他的观点。"],
+["dominant","显著的，占优的","[ˈdɑːmɪnənt]",11,"English is the dominant language in the world.","英语是世界上占主导地位的语言。"],
+["sufficient","足够的，充足的","[səˈfɪʃnt]",11,"We have sufficient time to finish the task.","我们有足够的时间完成任务。"],
+["immediate","立即的","[ɪˈmiːdiət]",11,"Please give me an immediate answer.","请立即给我答复。"],
+["enforcement","执行","[ɪnˈfɔːrsmənt]",11,"Law enforcement is necessary for social order.","法律执行对社会秩序是必要的。"],
+["inflation","膨胀","[ɪnˈfleɪʃn]",11,"Inflation has caused prices to rise.","通货膨胀导致物价上涨。"],
+["emphasis","强调，重要性","[ˈemfəsɪs]",11,"The school puts emphasis on English teaching.","学校强调英语教学。"],
+["rural","农村的","[ˈrʊrəl]",11,"He grew up in a rural area.","他在农村地区长大。"],
+["struggle","奋斗","[ˈstrʌɡl]",11,"We must struggle for our future.","我们必须为未来而奋斗。"],
+["construction","建筑，建造","[kənˈstrʌkʃn]",11,"The construction of the new road will take a year.","新路的建设将需要一年时间。"],
+["mechanic","机械的","[məˈkænɪk]",11,"He works as a mechanic in a factory.","他在工厂当机械师。"],
+["advanced","先进的","[ədˈvænst]",11,"We should learn advanced technology from other countries.","我们应该向其他国家学习先进技术。"],
+["native","本土的","[ˈneɪtɪv]",11,"She is a native speaker of English.","她的母语是英语。"],
+["express","表达","[ɪkˈspres]",11,"I can't express my feelings in words.","我无法用言语表达我的感受。"],
+["technical","科技的","[ˈteknɪkl]",11,"The technical problem was solved quickly.","技术问题很快解决了。"],
+["marriage","婚姻","[ˈmærɪdʒ]",11,"Their marriage is very happy.","他们的婚姻非常幸福。"],
+["manufacturer","制造商","[ˌmænjuˈfæktʃərər]",11,"The manufacturer produces high-quality cars.","这家制造商生产高质量的汽车。"],
+["indicate","表明","[ˈɪndɪkeɪt]",10,"The survey indicates that most students like English.","调查表明大多数学生喜欢英语。"],
+["characterized","以...为特点的","[ˈkærəktəraɪzd]",10,"The city is characterized by its old buildings.","这座城市以古老的建筑为特点。"],
+["eliminate","消除","[ɪˈlɪmɪneɪt]",10,"We should eliminate poverty in the world.","我们应该消除世界上的贫困。"],
+["entire","全部的","[ɪnˈtaɪər]",10,"He spent the entire day studying.","他花了一整天学习。"],
+["judge","法官，裁定","[dʒʌdʒ]",10,"The judge made a fair decision.","法官做出了公正的判决。"],
+["precisely","精确地","[prɪˈsaɪsli]",10,"Please tell me precisely what happened.","请精确地告诉我发生了什么。"],
+["tendency","倾向，趋势","[ˈtendənsi]",10,"He has a tendency to be late.","他有迟到的倾向。"],
+["apparently","显然地","[əˈpærəntli]",10,"Apparently, he didn't understand the question.","显然，他没有理解这个问题。"],
+["opposite","相反的","[ˈɑːpəzɪt]",10,"His opinion is opposite to mine.","他的意见与我的相反。"],
+["internal","内部的","[ɪnˈtɜːrnl]",10,"The company has some internal problems.","公司有一些内部问题。"],
+["random","随机的","[ˈrændəm]",10,"The teacher asked a random student to answer.","老师随机叫了一个学生回答。"],
+["constant","不变的","[ˈkɑːnstənt]",10,"He is constant in his efforts.","他不断努力。"],
+["obviously","明显地","[ˈɑːbviəsli]",10,"Obviously, he is the best student in our class.","显然，他是我们班最好的学生。"],
+["separate","分开的","[ˈseprət]",10,"The two problems are separate.","这两个问题是分开的。"],
+["blame","责备","[bleɪm]",10,"Don't blame others for your mistakes.","不要因为你的错误责备别人。"],
+["authority","权威，政府","[əˈθɔːrəti]",10,"The teacher is an authority on English.","这位老师是英语方面的权威。"],
+["psychology","心理学","[saɪˈkɑːlədʒi]",10,"He is studying psychology at university.","他在大学学习心理学。"],
+["religion","宗教","[rɪˈlɪdʒən]",10,"People have different religions.","人们有不同的宗教信仰。"],
+["reasonable","合理的","[ˈriːznəbl]",10,"Your request is reasonable.","你的要求是合理的。"],
+["vehicle","交通工具","[ˈviːəkl]",10,"Cars are a common vehicle in modern life.","汽车是现代生活中常见的交通工具。"],
+["tolerant","宽容的","[ˈtɑːlərənt]",10,"We should be tolerant of different views.","我们应该宽容不同的观点。"],
+["democratic","民主的","[ˌdeməˈkrætɪk]",10,"We live in a democratic society.","我们生活在民主社会。"],
+["statistical","统计的","[stəˈtɪstɪkl]",10,"The statistical data shows the trend.","统计数据表明了趋势。"],
+["possibility","可能性","[ˌpɑːsəˈbɪləti]",10,"There is a possibility that he will come.","他有可能来。"],
+["suicide","自杀","[ˈsuːɪsaɪd]",10,"He tried to commit suicide but was saved.","他试图自杀但被救了。"],
+["boost","促进","[buːst]",10,"The policy will boost the economy.","这项政策将促进经济发展。"],
+["tax","税金","[tæks]",10,"Everyone must pay tax according to the law.","每个人都必须依法纳税。"],
+["strategy","战略","[ˈstrætədʒi]",10,"We need a new strategy to win the game.","我们需要一个新策略来赢得比赛。"],
+["routine","常规","[ruːˈtiːn]",10,"Exercise is part of my daily routine.","锻炼是我日常生活的一部分。"],
+["enormous","巨大的","[ɪˈnɔːrməs]",10,"The project requires an enormous amount of money.","这个项目需要巨额资金。"],
+["lasting","持续","[ˈlæstɪŋ]",10,"They have a lasting friendship.","他们有着持久的友谊。"],
+["reward","奖励","[rɪˈwɔːrd]",10,"He received a reward for his hard work.","他因努力工作而获得了奖励。"],
+["infer","推理","[ɪnˈfɜːr]",10,"We can infer from his words that he is angry.","从他的话语中我们可以推断出他生气了。"],
+["ahead","向前","[əˈhed]",10,"We should look ahead and plan for the future.","我们应该向前看，为未来做计划。"],
+["attempt","尝试","[əˈtempt]",10,"He made an attempt to solve the problem.","他尝试解决这个问题。"],
+["contrary","相反的","[ˈkɑːntreri]",10,"Contrary to what I thought, he passed the exam.","与我想的相反，他通过了考试。"],
+["property","性质","[ˈprɑːpərti]",9,"The property of water is unique.","水的性质是独特的。"],
+["relevant","相关的","[ˈreləvənt]",9,"Please provide relevant information.","请提供相关信息。"],
+["artificial","人造的","[ˌɑːrtɪˈfɪʃl]",9,"Artificial intelligence is developing fast.","人工智能发展迅速。"],
+["permanent","永久的","[ˈpɜːrmənənt]",9,"He found a permanent job in the city.","他在城里找到了一份永久工作。"],
+["justified","正当理由的","[ˈdʒʌstɪfaɪd]",9,"His action was justified.","他的行为是正当的。"],
+["collective","集体的","[kəˈlektɪv]",9,"We should work for the collective good.","我们应该为集体利益工作。"],
+["innovation","创新","[ˌɪnəˈveɪʃn]",9,"Innovation is the key to development.","创新是发展的关键。"],
+["entrepreneur","企业家","[ˌɑːntrəprəˈnɜːr]",9,"He is a successful entrepreneur.","他是一位成功的企业家。"],
+["fiction","小说，虚构","[ˈfɪkʃn]",9,"She likes reading science fiction.","她喜欢读科幻小说。"],
+["distinction","区别","[dɪˈstɪŋkʃn]",9,"There is a clear distinction between the two.","两者之间有明显的区别。"],
+["urban","城市的","[ˈɜːrbən]",9,"Urban life is busy but convenient.","城市生活忙碌但方便。"],
+["virtual","虚拟的","[ˈvɜːrtʃuəl]",9,"Online shopping is a virtual market.","网上购物是一个虚拟市场。"],
+["differ","相异","[ˈdɪfər]",8,"Their opinions differ from each other.","他们的意见各不相同。"],
+["strengthen","强化","[ˈstreŋθn]",8,"We should strengthen our English skills.","我们应该加强英语技能。"],
+["spouse","配偶","[spaʊs]",8,"He lives with his spouse and children.","他和配偶及孩子住在一起。"],
+["release","释放，发行","[rɪˈliːs]",8,"The prisoner was released from jail.","囚犯从监狱被释放了。"],
+["neglect","忽视","[nɪˈɡlekt]",8,"We should not neglect our health.","我们不应该忽视健康。"],
+["furthermore","此外","[ˌfɜːrðərˈmɔːr]",8,"Furthermore, we need to save money.","此外，我们需要省钱。"],
+["determine","决定","[dɪˈtɜːrmɪn]",8,"He determined to study harder.","他决定更加努力学习。"],
+["approval","批准，支持","[əˈpruːvl]",8,"The plan got the approval of the manager.","计划得到了经理的批准。"],
+["discipline","纪律，学科","[ˈdɪsəplɪn]",8,"Good discipline is important in school.","良好的纪律在学校很重要。"],
+["origin","源头","[ˈɔːrɪdʒɪn]",8,"The origin of the word is Latin.","这个词的源头是拉丁语。"],
+["debate","争论","[dɪˈbeɪt]",8,"They had a heated debate about the topic.","他们就这个话题进行了激烈的争论。"],
+["influential","有影响的","[ˌɪnfluˈenʃl]",8,"He is an influential person in the company.","他是公司里有影响力的人。"],
+["dynamic","动态的","[daɪˈnæmɪk]",8,"The market is dynamic and changing.","市场是动态和变化的。"],
+["enhance","提高","[ɪnˈhæns]",8,"Reading can enhance your vocabulary.","阅读可以提高你的词汇量。"],
+["skeptical","怀疑的","[ˈskeptɪkl]",8,"I am skeptical about his promise.","我对他的承诺持怀疑态度。"],
+["commerce","贸易","[ˈkɑːmɜːrs]",8,"Commerce between the two countries is growing.","两国之间的贸易正在增长。"],
+["reveal","显示","[rɪˈviːl]",8,"The survey revealed that most people like music.","调查显示大多数人喜欢音乐。"],
+["merely","仅仅","[ˈmɪrli]",8,"He is merely a child.","他仅仅是个孩子。"],
+["modest","谦虚的","[ˈmɑːdɪst]",8,"He is modest about his achievements.","他对自己的成就很谦虚。"],
+["conventional","符合习俗的","[kənˈvenʃənl]",8,"She has conventional ideas about marriage.","她对婚姻有传统的观念。"],
+["assumption","假定","[əˈsʌmpʃn]",8,"Your assumption is wrong.","你的假定是错误的。"],
+["external","外部的","[ɪkˈstɜːrnl]",8,"We should consider external factors.","我们应该考虑外部因素。"],
+["emphasize","强调","[ˈemfəsaɪz]",8,"The teacher emphasized the importance of practice.","老师强调了练习的重要性。"],
+["desirable","渴望的","[dɪˈzaɪərəbl]",8,"A good job is desirable for everyone.","一份好工作是每个人都渴望的。"],
+["application","应用","[ˌæplɪˈkeɪʃn]",8,"The application of new technology is important.","新技术的应用很重要。"],
+["prior","先前的","[ˈpraɪər]",8,"Prior to the meeting, please read the report.","在会议之前，请阅读报告。"],
+["civil","公民的","[ˈsɪvl]",8,"We should protect civil rights.","我们应该保护公民权利。"],
+["institute","机构，制度","[ˈɪnstɪtuːt]",8,"He works in a research institute.","他在一个研究机构工作。"],
+["indifference","漠不关心","[ɪnˈdɪfrəns]",8,"His indifference to the problem made me angry.","他对问题的漠不关心让我生气。"],
+["extreme","极端的","[ɪkˈstriːm]",8,"The weather is extreme in this area.","这个地区的天气很极端。"],
+["identified","被识别的","[aɪˈdentɪfaɪd]",8,"The suspect was identified by the police.","嫌疑人被警方识别出来了。"],
+["massive","大量的","[ˈmæsɪv]",8,"The project needs massive investment.","这个项目需要大量投资。"],
+["hence","因此；今后","[hens]",8,"He was late, hence he missed the train.","他迟到了，因此错过了火车。"],
+["perspective","观点","[pərˈspektɪv]",8,"From my perspective, the plan is good.","从我的观点来看，这个计划是好的。"],
+["legitimate","合法的","[lɪˈdʒɪtɪmət]",8,"He has a legitimate reason for being absent.","他有合法的缺席理由。"],
+["prosperity","繁荣，成功","[prɑːˈsperəti]",8,"We wish our country prosperity.","我们祝愿我们的国家繁荣。"],
+["crude","粗糙的","[kruːd]",8,"The table is made of crude wood.","这张桌子是用粗糙的木头做的。"],
+["restriction","限制","[rɪˈstrɪkʃn]",8,"There are restrictions on the use of water.","水的使用有限制。"],
+["passion","激情","[ˈpæʃn]",8,"He has a passion for music.","他对音乐有激情。"],
+["rigid","严格的","[ˈrɪdʒɪd]",8,"The school has rigid rules.","学校有严格的规定。"],
+["mechanism","机制，构造","[ˈmekənɪzəm]",8,"The mechanism of the machine is complex.","这台机器的机制很复杂。"],
+["counterpart","对应物","[ˈkaʊntərpɑːrt]",8,"The English word has a Chinese counterpart.","这个英语单词有一个中文对应词。"],
+["divorce","离婚，分离","[dɪˈvɔːrs]",8,"They decided to divorce after ten years of marriage.","他们结婚十年后决定离婚。"],
+["properly","适当地","[ˈprɑːpərli]",8,"You should properly handle the problem.","你应该适当地处理这个问题。"],
+["concentration","专注集中","[ˌkɑːnsnˈtreɪʃn]",8,"He studied with great concentration.","他非常专注地学习。"],
+["guaranteed","有保证的","[ˌɡærənˈtiːd]",8,"The product is guaranteed for one year.","这个产品有一年的保证。"],
+["virtue","美德","[ˈvɜːrtʃuː]",8,"Honesty is a virtue.","诚实是一种美德。"],
+["pursuit","追赶","[pərˈsuːt]",8,"He is in pursuit of happiness.","他追求幸福。"],
+["severe","严重的","[sɪˈvɪr]",8,"The accident caused severe damage.","事故造成了严重损坏。"],
+["rarely","少见地","[ˈrerli]",8,"He rarely goes to the cinema.","他很少去电影院。"],
+["leadership","领导力","[ˈliːdərʃɪp]",8,"Good leadership is important for a team.","好的领导力对团队很重要。"],
+["engineering","工程","[ˌendʒɪˈnɪrɪŋ]",8,"He studies engineering at university.","他在大学学习工程学。"],
+["affordable","支付得起的","[əˈfɔːrdəbl]",8,"The house is affordable for us.","这房子我们买得起。"],
+["unfortunately","不幸地","[ʌnˈfɔːrtʃənətli]",8,"Unfortunately, he failed the exam.","不幸的是，他考试没及格。"],
+["effectively","高效地","[ɪˈfektɪvli]",8,"We should study effectively.","我们应该高效地学习。"],
+["typically","典型地","[ˈtɪpɪkli]",8,"Typically, students have a lot of homework.","通常，学生有很多作业。"],
+["forgiveness","遗忘","[fərˈɡɪvnəs]",8,"Forgiveness is a good quality.","宽恕是一种好品质。"],
+["prospect","前景","[ˈprɑːspekt]",8,"The prospect of the company is good.","公司的前景很好。"],
+["dramatic","戏剧的，巨大的","[drəˈmætɪk]",8,"The change was dramatic.","变化是巨大的。"],
+["broadly","广泛地","[ˈbrɔːdli]",8,"The book is broadly read.","这本书被广泛阅读。"],
+["satisfy","满意","[ˈsætɪsfaɪ]",8,"The result satisfied everyone.","结果让每个人都满意。"],
+["peculiar","特殊的","[pɪˈkjuːliər]",8,"He has a peculiar way of speaking.","他有特殊的说话方式。"],
+["virtually","事实上","[ˈvɜːrtʃuəli]",8,"Virtually, everyone agreed with the plan.","事实上，每个人都同意这个计划。"],
+["asset","资产","[ˈæset]",7,"Health is a great asset.","健康是巨大的财富。"],
+["hostility","敌意","[hɑːˈstɪləti]",7,"He showed hostility towards his opponent.","他对对手表现出敌意。"],
+["immune","免疫的","[ɪˈmjuːn]",7,"Vaccines make us immune to some diseases.","疫苗使我们对某些疾病免疫。"],
+["epidemic","传染病","[ˌepɪˈdemɪk]",7,"The epidemic spread quickly.","传染病传播得很快。"],
+["primarily","首先","[praɪˈmerəli]",7,"The problem is primarily caused by carelessness.","这个问题首先是由粗心引起的。"],
+["initial","最初的","[ɪˈnɪʃl]",7,"My initial reaction was surprise.","我最初的反应是惊讶。"],
+["minister","部长","[ˈmɪnɪstər]",7,"The minister gave a speech.","部长发表了讲话。"],
+["temporary","暂时的","[ˈtempəreri]",7,"This is a temporary job.","这是一份临时工作。"],
+["skepticism","怀疑论","[ˈskeptɪsɪzəm]",7,"He expressed skepticism about the plan.","他对计划表示怀疑。"],
+["coherent","连贯的","[koʊˈhɪrənt]",7,"His speech was coherent and clear.","他的演讲连贯清晰。"],
+["regardless","不管的","[rɪˈɡɑːrdləs]",7,"Regardless of the weather, we will go.","不管天气如何，我们都会去。"],
+["substantial","大量的","[səbˈstænʃl]",7,"He made a substantial contribution.","他做出了巨大贡献。"],
+["structure","结构","[ˈstrʌktʃər]",7,"The structure of the essay is clear.","文章的结构清晰。"],
+["integrity","完整","[ɪnˈteɡrəti]",7,"He is a man of integrity.","他是一个正直的人。"],
+["feedback","反馈","[ˈfiːdbæk]",7,"The teacher gave us feedback on our homework.","老师对我们的作业给出了反馈。"],
+["moderate","适度的","[ˈmɑːdərət]",7,"We should take moderate exercise.","我们应该适度锻炼。"],
+["consequently","因此","[ˈkɑːnsɪkwentli]",7,"He didn't study, consequently he failed.","他没学习，因此没及格。"],
+["confident","自信的","[ˈkɑːnfɪdənt]",7,"She is confident about the future.","她对未来充满自信。"],
+["candidate","候选人","[ˈkændɪdət]",7,"He is a candidate for the position.","他是这个职位的候选人。"],
+["passionate","热情的","[ˈpæʃənət]",7,"She is passionate about teaching.","她对教学充满热情。"],
+["diverse","不同的","[daɪˈvɜːrs]",7,"The students come from diverse backgrounds.","学生们来自不同的背景。"],
+["engage","参与","[ɪnˈɡeɪdʒ]",7,"Students should engage in class activities.","学生应该参与课堂活动。"],
+["philosophy","哲学","[fəˈlɑːsəfi]",7,"He studies philosophy at university.","他在大学学习哲学。"],
+["subtle","微妙的","[ˈsʌtl]",7,"There is a subtle difference between the two words.","这两个词之间有微妙的区别。"],
+["resistance","阻力","[rɪˈzɪstəns]",7,"The plan met with strong resistance.","计划遭到了强烈阻力。"],
+["unconscious","无意识的","[ʌnˈkɑːnʃəs]",7,"He was unconscious of the danger.","他没有意识到危险。"],
+["imitate","模仿","[ˈɪmɪteɪt]",7,"Children often imitate their parents.","孩子们经常模仿父母。"],
+["permission","允许","[pərˈmɪʃn]",7,"You need permission to enter the room.","你需要允许才能进入房间。"],
+["thriving","兴旺发达","[ˈθraɪvɪŋ]",7,"The business is thriving.","生意兴旺发达。"],
+["appreciation","欣赏","[əˌpriːʃiˈeɪʃn]",7,"I have great appreciation for your help.","我非常感谢你的帮助。"],
+["trait","特性","[treɪt]",7,"Patience is a good trait.","耐心是一种好品质。"],
+["dedicated","投入的","[ˈdedɪkeɪtɪd]",7,"He is dedicated to his work.","他对工作很投入。"],
+["barely","仅仅","[ˈberli]",7,"He barely passed the exam.","他勉强通过了考试。"],
+["familiar","熟悉的","[fəˈmɪliər]",7,"I am familiar with this city.","我对这座城市很熟悉。"],
+["guilty","有罪的","[ˈɡɪlti]",7,"He felt guilty about the mistake.","他对错误感到内疚。"],
+["democracy","民主","[dɪˈmɑːkrəsi]",7,"Democracy is important in modern society.","民主在现代社会很重要。"],
+["optimism","乐观","[ˈɑːptɪmɪzəm]",7,"He has optimism about the future.","他对未来很乐观。"],
+["astronomy","天文学","[əˈstrɑːnəmi]",7,"He is interested in astronomy.","他对天文学感兴趣。"],
+["identity","身份，一致","[aɪˈdentəti]",7,"He lost his identity card.","他丢了身份证。"],
+["vulnerable","脆弱的","[ˈvʌlnərəbl]",7,"Children are vulnerable to disease.","儿童容易生病。"],
+["plastic","塑料","[ˈplæstɪk]",7,"Plastic bags cause pollution.","塑料袋造成污染。"],
+["urgent","紧急的","[ˈɜːrdʒənt]",7,"This is an urgent problem.","这是一个紧急问题。"],
+["interaction","互动","[ˌɪntərˈækʃn]",7,"Interaction between students is important.","学生之间的互动很重要。"],
+["financially","财政地","[faɪˈnænʃəli]",7,"He is financially independent.","他经济上独立。"],
+["ambiguous","模棱两可的","[æmˈbɪɡjuəs]",7,"His answer was ambiguous.","他的回答模棱两可。"],
+["cautious","小心的","[ˈkɔːʃəs]",7,"Be cautious when crossing the road.","过马路时要小心。"],
+["manner","方法","[ˈmænər]",7,"He answered in a polite manner.","他以礼貌的方式回答。"],
+["strict","严格的","[strɪkt]",7,"The teacher is strict with us.","老师对我们很严格。"],
+["imagination","想象","[ɪˌmædʒɪˈneɪʃn]",7,"Children have rich imagination.","孩子们有丰富的想象力。"],
+["assume","假设，认为","[əˈsuːm]",7,"Let's assume that he is right.","让我们假设他是对的。"],
+["publish","出版发行","[ˈpʌblɪʃ]",7,"The book will be published next month.","这本书将于下个月出版。"],
+["worthwhile","值得的","[ˌwɜːrθˈwaɪl]",7,"It is worthwhile to learn English well.","学好英语是值得的。"],
+["deliver","提供，运输","[dɪˈlɪvər]",7,"He delivers newspapers every morning.","他每天早上送报纸。"],
+["uncertain","不确定的","[ʌnˈsɜːrtn]",7,"The future is uncertain.","未来是不确定的。"],
+["parallel","平行的","[ˈpærəlel]",6,"The two lines are parallel.","这两条线是平行的。"],
+["circulation","流通，传播","[ˌsɜːrkjəˈleɪʃn]",6,"The circulation of information is fast.","信息流通很快。"],
+["esteem","尊重","[ɪˈstiːm]",6,"We should esteem our teachers.","我们应该尊重老师。"],
+["stem","起源于","[stem]",6,"The problem stems from carelessness.","问题源于粗心。"],
+["reluctant","不情愿的","[rɪˈlʌktənt]",6,"He was reluctant to leave.","他不愿意离开。"],
+["distinctly","明显地","[dɪˈstɪŋktli]",6,"He distinctly remembered the event.","他清楚地记得那件事。"],
+["preserve","保存；保护","[prɪˈzɜːrv]",6,"We should preserve our cultural heritage.","我们应该保护我们的文化遗产。"],
+["fitness","健康，适当","[ˈfɪtnəs]",6,"Exercise improves your fitness.","锻炼改善你的健康。"],
+["indifferent","冷淡的","[ɪnˈdɪfrənt]",6,"He is indifferent to the problem.","他对这个问题漠不关心。"],
+["reject","拒绝","[rɪˈdʒekt]",6,"She rejected his invitation.","她拒绝了他的邀请。"],
+["folk","民族，人民","[foʊk]",6,"Folk music is very popular.","民间音乐很受欢迎。"],
+["misery","痛苦","[ˈmɪzəri]",6,"The war brought misery to people.","战争给人们带来了痛苦。"],
+["acquisition","获得物","[ˌækwɪˈzɪʃn]",6,"The acquisition of knowledge is important.","知识的获取很重要。"],
+["academics","学术，学者","[ˌækəˈdemɪks]",6,"He is good at academics.","他擅长学术。"],
+["inquiry","调查询问","[ɪnˈkwaɪəri]",6,"The police made an inquiry into the case.","警方对案件进行了调查。"],
+["contribution","贡献","[ˌkɑːntrɪˈbjuːʃn]",6,"He made a great contribution to science.","他对科学做出了巨大贡献。"],
+["judgment","判断","[ˈdʒʌdʒmənt]",6,"His judgment was correct.","他的判断是正确的。"],
+["ethic","伦理","[ˈeθɪk]",6,"Work ethic is important in a job.","职业道德在工作中很重要。"],
+["bound","注定的","[baʊnd]",6,"He is bound to succeed.","他注定会成功。"],
+["profound","深厚的","[prəˈfaʊnd]",6,"He has profound knowledge.","他有深厚的知识。"],
+["leakage","泄漏","[ˈliːkɪdʒ]",6,"The leakage of gas is dangerous.","气体泄漏很危险。"],
+["regulatory","管理的","[ˈreɡjələtɔːri]",6,"The regulatory system needs improvement.","管理系统需要改进。"],
+["complicated","难懂复杂的","[ˈkɑːmplɪkeɪtɪd]",6,"This is a complicated problem.","这是一个复杂的问题。"],
+["exist","存在；生存","[ɪɡˈzɪst]",6,"Does life exist on other planets?","其他星球上存在生命吗？"],
+["Nobel","诺贝尔","[noʊˈbel]",6,"He won the Nobel Prize.","他获得了诺贝尔奖。"],
+["recognition","识别","[ˌrekəɡˈnɪʃn]",6,"He received recognition for his work.","他的工作得到了认可。"],
+["quote","引述","[kwoʊt]",6,"He quoted a famous saying.","他引用了一句名言。"],
+["secure","安全的","[sɪˈkjʊr]",6,"The building is secure.","这栋建筑很安全。"],
+["billion","十亿；大量","[ˈbɪljən]",6,"The company is worth billions.","这家公司价值数十亿。"],
+["reverse","颠倒；撤销","[rɪˈvɜːrs]",6,"He reversed the car.","他倒了车。"],
+["chemical","化学的","[ˈkemɪkl]",6,"Chemical reactions are common.","化学反应很常见。"],
+["combat","战斗","[ˈkɑːmbæt]",6,"The soldiers were ready for combat.","士兵们准备好战斗。"],
+["default","默认，违约","[dɪˈfɔːlt]",6,"The default setting is fine.","默认设置可以。"],
+["count","数数；重要","[kaʊnt]",6,"Please count the numbers.","请数一下数字。"],
+["launch","发射","[lɔːntʃ]",6,"The rocket was launched successfully.","火箭成功发射。"],
+["solution","解决方案","[səˈluːʃn]",6,"We need a solution to the problem.","我们需要解决问题的方案。"],
+["remarkable","卓越的；显著的","[rɪˈmɑːrkəbl]",6,"He made remarkable progress.","他取得了显著进步。"],
+["complain","投诉；抱怨","[kəmˈpleɪn]",6,"He complained about the service.","他投诉了服务。"],
+["innovative","革新的","[ˈɪnəveɪtɪv]",6,"This is an innovative idea.","这是一个创新的想法。"],
+["shelter","庇护","[ˈʃeltər]",6,"They took shelter from the rain.","他们躲雨。"],
+["material","物质的/材料；原料","[məˈtɪriəl]",6,"The material is of good quality.","材料质量很好。"],
+["connection","连接","[kəˈnekʃn]",6,"There is a connection between the two events.","两个事件之间有联系。"],
+["outlook","展望；态度","[ˈaʊtlʊk]",6,"The outlook for the future is good.","未来的前景很好。"],
+["scheme","计划；组合","[skiːm]",6,"He came up with a new scheme.","他想出了一个新计划。"],
+["allowance","津贴，零用钱","[əˈlaʊəns]",6,"He gets a monthly allowance.","他每月有津贴。"],
+["engagement","婚约；约会","[ɪnˈɡeɪdʒmənt]",6,"They announced their engagement.","他们宣布了婚约。"],
+["attend","出席","[əˈtend]",6,"I will attend the meeting.","我将出席会议。"],
+["employ","雇佣","[ɪmˈplɔɪ]",6,"The company employs many workers.","这家公司雇佣了许多工人。"],
+["investigation","调查","[ɪnˌvestɪˈɡeɪʃn]",6,"The investigation is still going on.","调查仍在进行。"],
+["grasp","抓牢；理解","[ɡræsp]",6,"He grasped the rope tightly.","他紧紧抓住绳子。"],
+["yield","产出n.产量","[jiːld]",6,"The farm yields a lot of rice.","农场产出很多大米。"],
+["sharing","共同的","[ˈʃerɪŋ]",6,"Sharing is a good quality.","分享是一种好品质。"],
+["adapt","使适应","[əˈdæpt]",6,"We should adapt to the new environment.","我们应该适应新环境。"],
+["glory","光荣","[ˈɡlɔːri]",6,"He won glory for his country.","他为国家赢得了荣誉。"],
+["comprehensive","综合的","[ˌkɑːmprɪˈhensɪv]",6,"The book is comprehensive.","这本书很全面。"],
+["additional","额外的","[əˈdɪʃənl]",6,"We need additional time.","我们需要额外的时间。"],
+["perceive","察觉，感觉","[pərˈsiːv]",6,"I perceived a change in his mood.","我察觉到他情绪的变化。"],
+["continent","大陆","[ˈkɑːntɪnənt]",6,"Asia is the largest continent.","亚洲是最大的大陆。"],
+["prejudice","偏见","[ˈpredʒudɪs]",6,"We should avoid prejudice.","我们应该避免偏见。"],
+["isolated","被孤立的","[ˈaɪsəleɪtɪd]",6,"He felt isolated from others.","他感到被孤立了。"],
+["inherent","固有的","[ɪnˈhɪrənt]",6,"There are inherent risks in the plan.","计划有固有的风险。"],
+["leisure","闲暇","[ˈliːʒər]",6,"He reads in his leisure time.","他在闲暇时间读书。"],
+["corruption","贪污","[kəˈrʌpʃn]",6,"Corruption is a serious problem.","贪污是一个严重问题。"],
+["involving","涉及","[ɪnˈvɑːlvɪŋ]",6,"The job involves a lot of travel.","这份工作涉及大量旅行。"],
+["equip","装备","[ɪˈkwɪp]",6,"The school equipped the lab with new computers.","学校给实验室装备了新电脑。"],
+["scope","范围，机会，能力","[skoʊp]",5,"The scope of the study is wide.","研究范围很广。"],
+["deem","认为","[diːm]",5,"I deem it necessary to go.","我认为有必要去。"],
+["fulfill","履行","[fʊlˈfɪl]",5,"He fulfilled his promise.","他履行了诺言。"],
+["patented","专利的","[ˈpætntɪd]",5,"The product is patented.","这个产品是专利的。"],
+["initially","最初地","[ɪˈnɪʃəli]",5,"Initially, he didn't agree.","最初，他不同意。"],
+["transaction","交易","[trænˈzækʃn]",5,"The transaction was completed.","交易完成了。"],
+["protection","保护","[prəˈtekʃn]",5,"We need protection from the sun.","我们需要防晒保护。"],
+["arouse","唤醒","[əˈraʊz]",5,"His words aroused my interest.","他的话引起了我的兴趣。"],
+["analyze","分析","[ˈænəlaɪz]",5,"We should analyze the problem.","我们应该分析问题。"],
+["evaluation","评价","[ɪˌvæljuˈeɪʃn]",5,"The evaluation of the project is positive.","项目的评价是积极的。"],
+["evade","逃避","[ɪˈveɪd]",5,"He tried to evade the question.","他试图回避问题。"],
+["gradual","逐渐的","[ˈɡrædʒuəl]",5,"There was a gradual change.","有逐渐的变化。"],
+["alternative","替代的","[ɔːlˈtɜːrnətɪv]",5,"We have an alternative plan.","我们有一个替代计划。"],
+["grocery","食品杂货店","[ˈɡroʊsəri]",5,"I bought food at the grocery.","我在杂货店买了食物。"],
+["dominate","控制，支配","[ˈdɑːmɪneɪt]",5,"He dominates the team.","他控制着团队。"],
+["unfamiliar","不熟悉的","[ˌʌnfəˈmɪliər]",5,"The city is unfamiliar to me.","这座城市对我不熟悉。"],
+["chain","链","[tʃeɪn]",5,"He wore a gold chain.","他戴着一条金链。"],
+["straight","直的；连续的","[streɪt]",5,"The road is straight.","这条路是直的。"],
+["jump","跳跃","[dʒʌmp]",5,"He jumped over the fence.","他跳过了栅栏。"],
+["recruit","征募","[rɪˈkruːt]",5,"The company recruits new employees.","公司招募新员工。"],
+["sustain","维持","[səˈsteɪn]",5,"We need to sustain the effort.","我们需要维持努力。"],
+["appointment","任命，约定","[əˈpɔɪntmənt]",5,"He got an appointment as manager.","他被任命为经理。"],
+["description","描述","[dɪˈskrɪpʃn]",5,"Can you give a description of the man?","你能描述一下那个人吗？"],
+["composition","构成，作文","[ˌkɑːmpəˈzɪʃn]",5,"The composition of the team is good.","团队的构成很好。"],
+["audience","观众","[ˈɔːdiəns]",5,"The audience enjoyed the show.","观众喜欢这场表演。"],
+["vague","模糊的","[veɪɡ]",5,"His answer was vague.","他的回答很模糊。"],
+["pursue","追求，执行","[pərˈsuː]",5,"She wants to pursue her studies abroad.","她想出国深造。"],
+["nervous","神经的","[ˈnɜːrvəs]",5,"He was nervous before the exam.","考试前他很紧张。"],
+["advertisement","广告","[ˌædvərˈtaɪzmənt]",5,"I saw an advertisement for the job.","我看到了这份工作的广告。"],
+["visible","明显的","[ˈvɪzəbl]",5,"The star is visible at night.","这颗星星在晚上可见。"],
+["brand","品牌","[brænd]",5,"This brand is very popular.","这个品牌很受欢迎。"],
+["eager","渴望的，急切的","[ˈiːɡər]",5,"He is eager to learn.","他渴望学习。"],
+["conflict","冲突","[ˈkɑːnflɪkt]",5,"There was a conflict between them.","他们之间发生了冲突。"],
+["delight","高兴","[dɪˈlaɪt]",5,"The news brought her great delight.","这个消息使她非常高兴。"],
+["enthusiasm","热心","[ɪnˈθuːziæzəm]",5,"He showed great enthusiasm for the project.","他对项目表现出极大的热情。"],
+["undergraduate","本科生","[ˌʌndərˈɡrædʒuət]",5,"He is an undergraduate student.","他是一名本科生。"],
+["conclude","总结","[kənˈkluːd]",5,"Let me conclude the meeting.","让我总结一下会议。"],
+["inner","内部的","[ˈɪnər]",5,"We should focus on inner beauty.","我们应该关注内在美。"],
+["limitation","限制","[ˌlɪmɪˈteɪʃn]",5,"Everyone has limitations.","每个人都有局限性。"],
+["legitimacy","合法","[lɪˈdʒɪtɪməsi]",5,"The legitimacy of the decision is questioned.","决定的合法性受到质疑。"],
+["convincing","令人信服的","[kənˈvɪnsɪŋ]",5,"His argument was convincing.","他的论点令人信服。"],
+["prone","有...倾向的","[proʊn]",5,"He is prone to make mistakes.","他容易犯错误。"],
+["upset","使心烦","[ʌpˈset]",5,"The bad news upset her.","坏消息使她心烦。"],
+["license","执照，许可证","[ˈlaɪsns]",5,"He has a driver's license.","他有驾驶执照。"],
+["credit","信用","[ˈkredɪt]",5,"He has good credit.","他信用良好。"],
+["norm","标准","[nɔːrm]",5,"Social norms are important.","社会标准很重要。"],
+["passive","被动的，消极的","[ˈpæsɪv]",5,"He is passive in class.","他在课堂上很被动。"],
+["cognitive","认知的","[ˈkɑːɡnətɪv]",5,"Cognitive skills are important.","认知技能很重要。"],
+["bias","偏见","[ˈbaɪəs]",5,"We should avoid bias.","我们应该避免偏见。"],
+["campus","校园；大学","[ˈkæmpəs]",5,"The campus is beautiful.","校园很美。"],
+["defendant","防御防守的","[dɪˈfendənt]",5,"The defendant denied the charge.","被告否认了指控。"],
+["admission","承认","[ədˈmɪʃn]",5,"His admission of guilt surprised us.","他承认有罪让我们惊讶。"],
+["anticipate","预料","[ænˈtɪsɪpeɪt]",5,"We anticipate a good result.","我们预料会有好结果。"],
+["strain","张力；拉紧","[streɪn]",5,"The strain on the rope was too much.","绳子上的张力太大了。"],
+["dilemma","困境","[dɪˈlemə]",4,"He is in a dilemma.","他处于困境中。"],
+["craft","工艺，技能","[kræft]",4,"The craft is very delicate.","工艺非常精致。"],
+["vital","至关重要的","[ˈvaɪtl]",4,"Water is vital to life.","水对生命至关重要。"],
+["complaint","抱怨","[kəmˈpleɪnt]",4,"He made a complaint about the noise.","他抱怨噪音。"],
+["fossil","化石，老古董","[ˈfɑːsl]",4,"The fossil is millions of years old.","这块化石有数百万年历史。"],
+["provision","规定，供给","[prəˈvɪʒn]",4,"The provision of the contract is clear.","合同的规定很明确。"],
+["explicitly","明确地","[ɪkˈsplɪsɪtli]",4,"He explicitly told us the rules.","他明确告诉我们规则。"],
+["priority","优先","[praɪˈɔːrəti]",4,"Safety is our first priority.","安全是我们的首要任务。"],
+["implicit","含蓄的","[ɪmˈplɪsɪt]",4,"His implicit meaning was clear.","他的含蓄意思很清楚。"],
+["innocent","无辜的","[ˈɪnəsnt]",4,"He is innocent of the crime.","他无罪。"],
+["detailed","详细的","[ˈdiːteɪld]",4,"Please give a detailed report.","请给一份详细的报告。"],
+["well-being","幸福","[ˌwelˈbiːɪŋ]",4,"Health is important for well-being.","健康对幸福很重要。"],
+["association","协会","[əˌsoʊsiˈeɪʃn]",4,"He joined the English association.","他加入了英语协会。"],
+["minimal","最低的","[ˈmɪnɪml]",4,"The damage was minimal.","损失是最小的。"],
+["instinct","本能，直觉","[ˈɪnstɪŋkt]",4,"Animals have strong instincts.","动物有很强的本能。"],
+["district","地区","[ˈdɪstrɪkt]",4,"He lives in a busy district.","他住在一个繁忙的地区。"],
+["opponent","对手","[əˈpoʊnənt]",4,"He beat his opponent.","他打败了对手。"],
+["tuition","学费；讲授","[tuˈɪʃn]",4,"Tuition is expensive.","学费很贵。"],
+["promotion","提升","[prəˈmoʊʃn]",4,"He got a promotion.","他得到了提升。"],
+["literacy","读写能力","[ˈlɪtərəsi]",4,"Literacy is important for everyone.","读写能力对每个人都很重要。"],
+["literally","照字面地，真正地","[ˈlɪtərəli]",4,"He literally translated the sentence.","他照字面翻译了句子。"],
+["volume","量；体积","[ˈvɑːljuːm]",4,"The volume of traffic is large.","交通量很大。"],
+["unreliable","不可靠的","[ˌʌnrɪˈlaɪəbl]",4,"The information is unreliable.","信息不可靠。"],
+["consistently","一贯地","[kənˈsɪstəntli]",4,"He consistently works hard.","他一贯努力工作。"],
+["household","家庭的","[ˈhaʊshoʊld]",4,"Household chores are shared.","家务是分担的。"],
+["narrow","狭窄的","[ˈnæroʊ]",4,"The road is narrow.","路很窄。"],
+["absorb","吸收","[əbˈzɔːrb]",4,"Plants absorb water.","植物吸收水分。"],
+["compensate","补偿","[ˈkɑːmpenseɪt]",4,"The company compensated him for the loss.","公司赔偿了他的损失。"],
+["appreciate","欣赏","[əˈpriːʃieɪt]",4,"I appreciate your help.","我感谢你的帮助。"],
+["immigrant","移民的","[ˈɪmɪɡrənt]",4,"He is an immigrant from another country.","他是来自另一个国家的移民。"],
+["inclined","有......倾向","[ɪnˈklaɪnd]",4,"I am inclined to agree with you.","我倾向于同意你。"],
+["committee","委员会","[kəˈmɪti]",4,"The committee made a decision.","委员会做出了决定。"],
+["negotiate","谈判","[nɪˈɡoʊʃieɪt]",4,"They negotiated a new contract.","他们谈判了一份新合同。"],
+["justify","证明合法","[ˈdʒʌstɪfaɪ]",4,"Nothing can justify his behavior.","没有什么能证明他的行为是正当的。"],
+["fuel","燃料v.推动","[ˈfjuːəl]",4,"We need fuel for the car.","我们需要汽车的燃料。"],
+["commodity","商品","[kəˈmɑːdəti]",4,"Commodities are traded in the market.","商品在市场上交易。"],
+["shortage","缺乏","[ˈʃɔːrtɪdʒ]",4,"There is a shortage of water.","水缺乏。"],
+["strategic","策略的","[strəˈtiːdʒɪk]",4,"This is a strategic decision.","这是一个战略决策。"],
+["reorganize","重新安排","[riˈɔːrɡənaɪz]",4,"We need to reorganize the team.","我们需要重新安排团队。"],
+["nonsense","胡言乱语","[ˈnɑːnsens]",4,"Don't talk nonsense.","别胡说。"],
+["independently","独立地","[ˌɪndɪˈpendəntli]",4,"He works independently.","他独立工作。"],
+["dramatically","显著地","[drəˈmætɪkli]",4,"The situation changed dramatically.","情况显著变化。"],
+["dispute","争议","[dɪˈspjuːt]",4,"They had a dispute over money.","他们因钱发生争议。"],
+["deprive","剥夺","[dɪˈpraɪv]",4,"The war deprived them of their homes.","战争剥夺了他们的家园。"],
+["demonstrate","展示","[ˈdemənstreɪt]",4,"He demonstrated how to use the machine.","他演示了如何使用机器。"],
+["concrete","具体的","[ˈkɑːnkriːt]",4,"We need concrete evidence.","我们需要具体的证据。"],
+["ordinary","普通的","[ˈɔːrdneri]",4,"He is an ordinary student.","他是一个普通学生。"],
+["sponsor","赞助；发起","[ˈspɑːnsər]",4,"The company sponsored the event.","公司赞助了这次活动。"],
+["flawed","有缺陷的","[flɔːd]",4,"The plan is flawed.","这个计划有缺陷。"],
+["exert","运用","[ɪɡˈzɜːrt]",4,"He exerted all his strength.","他使出全身力气。"],
+["insist","坚持，强调","[ɪnˈsɪst]",4,"She insisted on going alone.","她坚持独自去。"],
+["supplement","增补，补充","[ˈsʌplɪmənt]",4,"He supplements his income with a part-time job.","他靠兼职增补收入。"],
+["aging","老化","[ˈeɪdʒɪŋ]",4,"The aging population is a problem.","人口老龄化是一个问题。"],
+["extension","拓展","[ɪkˈstenʃn]",4,"The extension of the deadline is helpful.","截止日期的延长很有帮助。"],
+["route","路线","[ruːt]",4,"This is the shortest route.","这是最短的路线。"],
+["correspond","符合，一致","[ˌkɔːrəˈspɑːnd]",4,"His actions correspond with his words.","他的行动与言语相符。"],
+["switch","开关","[swɪtʃ]",4,"Please turn off the switch.","请关掉开关。"]
+];
+
+/* ===== EX_DICT 开始 ===== */
+const EX_DICT = {
+"the":["这","[ðə]"],"a":["一个","[ə]"],"an":["一个","[ən]"],"and":["和","[ænd]"],"or":["或者","[ɔːr]"],
+"but":["但是","[bʌt]"],"of":["的","[əv]"],"to":["到","[tuː]"],"in":["在...里","[ɪn]"],"on":["在...上","[ɑːn]"],
+"at":["在","[æt]"],"for":["为了","[fɔːr]"],"with":["和...一起","[wɪð]"],"from":["从","[frʌm]"],"by":["通过","[baɪ]"],
+"as":["作为","[æz]"],"is":["是","[ɪz]"],"are":["是","[ɑːr]"],"was":["是(过去)","[wʌz]"],"were":["是(过去)","[wɜːr]"],
+"be":["是","[biː]"],"been":["是(过去分词)","[biːn]"],"have":["有","[hæv]"],"has":["有","[hæz]"],"had":["有(过去)","[hæd]"],
+"do":["做","[duː]"],"does":["做","[dʌz]"],"did":["做(过去)","[dɪd]"],"will":["将会","[wɪl]"],"would":["会","[wʊd]"],
+"can":["能","[kæn]"],"could":["能","[kʊd]"],"should":["应该","[ʃʊd]"],"must":["必须","[mʌst]"],"may":["可能","[meɪ]"],
+"might":["可能","[maɪt]"],"this":["这个","[ðɪs]"],"that":["那个","[ðæt]"],"these":["这些","[ðiːz]"],"those":["那些","[ðoʊz]"],
+"it":["它","[ɪt]"],"its":["它的","[ɪts]"],"they":["他们","[ðeɪ]"],"them":["他们","[ðem]"],"their":["他们的","[ðer]"],
+"we":["我们","[wiː]"],"us":["我们","[ʌs]"],"our":["我们的","[aʊr]"],"you":["你","[juː]"],"your":["你的","[jʊr]"],
+"he":["他","[hiː]"],"him":["他","[hɪm]"],"his":["他的","[hɪz]"],"she":["她","[ʃiː]"],"her":["她的","[hɜːr]"],
+"i":["我","[aɪ]"],"me":["我","[miː]"],"my":["我的","[maɪ]"],"mine":["我的","[maɪn]"],"who":["谁","[huː]"],
+"what":["什么","[wɑːt]"],"when":["什么时候","[wen]"],"where":["哪里","[wer]"],"why":["为什么","[waɪ]"],"how":["怎样","[haʊ]"],
+"which":["哪一个","[wɪtʃ]"],"if":["如果","[ɪf]"],"because":["因为","[bɪˈkɔːz]"],"so":["所以","[soʊ]"],"than":["比","[ðæn]"],
+"then":["然后","[ðen]"],"there":["那里","[ðer]"],"here":["这里","[hɪr]"],"now":["现在","[naʊ]"],"also":["也","[ˈɔːlsoʊ]"],
+"just":["只是","[dʒʌst]"],"only":["只","[ˈoʊnli]"],"even":["甚至","[ˈiːvn]"],"still":["仍然","[stɪl]"],"yet":["还","[jet]"],
+"already":["已经","[ɔːlˈredi]"],"very":["非常","[ˈveri]"],"too":["太","[tuː]"],"much":["多","[mʌtʃ]"],"many":["许多","[ˈmeni]"],
+"more":["更多","[mɔːr]"],"most":["最多","[moʊst]"],"some":["一些","[sʌm]"],"any":["任何","[ˈeni]"],"all":["全部","[ɔːl]"],
+"both":["两者","[boʊθ]"],"each":["每个","[iːtʃ]"],"every":["每个","[ˈevri]"],"other":["其他","[ˈʌðər]"],"another":["另一个","[əˈnʌðər]"],
+"such":["这样的","[sʌtʃ]"],"no":["不","[noʊ]"],"not":["不","[nɑːt]"],"never":["从不","[ˈnevər]"],"always":["总是","[ˈɔːlweɪz]"],
+"often":["经常","[ˈɔːfn]"],"usually":["通常","[ˈjuːʒuəli]"],"sometimes":["有时","[ˈsʌmtaɪmz]"],"soon":["很快","[suːn]"],"later":["后来","[ˈleɪtər]"],
+"before":["之前","[bɪˈfɔːr]"],"after":["之后","[ˈæftər]"],"during":["在...期间","[ˈdʊrɪŋ]"],"between":["在...之间","[bɪˈtwiːn]"],"among":["在...中","[əˈmʌŋ]"],
+"about":["关于","[əˈbaʊt]"],"into":["进入","[ˈɪntuː]"],"through":["穿过","[θruː]"],"over":["在...上","[ˈoʊvər]"],"under":["在...下","[ˈʌndər]"],
+"up":["向上","[ʌp]"],"down":["向下","[daʊn]"],"out":["出去","[aʊt]"],"off":["离开","[ɔːf]"],"back":["回来","[bæk]"],
+"good":["好的","[ɡʊd]"],"bad":["坏的","[bæd]"],"big":["大的","[bɪɡ]"],"small":["小的","[smɔːl]"],"new":["新的","[nuː]"],
+"old":["旧的","[oʊld]"],"young":["年轻的","[jʌŋ]"],"long":["长的","[lɔːŋ]"],"short":["短的","[ʃɔːrt]"],"high":["高的","[haɪ]"],
+"low":["低的","[loʊ]"],"hard":["难的","[hɑːrd]"],"easy":["容易的","[ˈiːzi]"],"different":["不同的","[ˈdɪfrənt]"],"same":["相同的","[seɪm]"],
+"important":["重要的","[ɪmˈpɔːrtnt]"],"possible":["可能的","[ˈpɑːsəbl]"],"real":["真的","[ˈriːəl]"],"true":["真实的","[truː]"],"right":["对的","[raɪt]"],
+"wrong":["错的","[rɔːŋ]"],"sure":["确定的","[ʃʊr]"],"certain":["确定的","[ˈsɜːrtn]"],"clear":["清楚的","[klɪr]"],"free":["自由的","[friː]"],
+"full":["满的","[fʊl]"],"empty":["空的","[ˈempti]"],"open":["打开的","[ˈoʊpən]"],"close":["近的","[kloʊs]"],"early":["早的","[ˈɜːrli]"],
+"late":["晚的","[leɪt]"],"fast":["快的","[fæst]"],"slow":["慢的","[sloʊ]"],"quick":["快的","[kwɪk]"],"main":["主要的","[meɪn]"],
+"major":["主要的","[ˈmeɪdʒər]"],"minor":["次要的","[ˈmaɪnər]"],"common":["常见的","[ˈkɑːmən]"],"special":["特殊的","[ˈspeʃl]"],"general":["一般的","[ˈdʒenrəl]"],
+"public":["公共的","[ˈpʌblɪk]"],"private":["私人的","[ˈpraɪvət]"],"national":["国家的","[ˈnæʃnəl]"],"local":["当地的","[ˈloʊkl]"],"global":["全球的","[ˈɡloʊbl]"],
+"social":["社会的","[ˈsoʊʃl]"],"cultural":["文化的","[ˈkʌltʃərəl]"],"economic":["经济的","[ˌiːkəˈnɑːmɪk]"],"political":["政治的","[pəˈlɪtɪkl]"],"historical":["历史的","[hɪˈstɔːrɪkl]"],
+"science":["科学","[ˈsaɪəns]"],"technology":["技术","[tekˈnɑːlədʒi]"],"education":["教育","[ˌedʒuˈkeɪʃn]"],"government":["政府","[ˈɡʌvərnmənt]"],"company":["公司","[ˈkʌmpəni]"],
+"country":["国家","[ˈkʌntri]"],"city":["城市","[ˈsɪti]"],"school":["学校","[skuːl]"],"family":["家庭","[ˈfæməli]"],"student":["学生","[ˈstuːdnt]"],
+"teacher":["老师","[ˈtiːtʃər]"],"people":["人们","[ˈpiːpl]"],"person":["人","[ˈpɜːrsn]"],"man":["男人","[mæn]"],"woman":["女人","[ˈwʊmən]"],
+"child":["孩子","[tʃaɪld]"],"children":["孩子们","[ˈtʃɪldrən]"],"friend":["朋友","[frend]"],"parent":["父母","[ˈperənt]"],"team":["团队","[tiːm]"],
+"group":["组","[ɡruːp]"],"part":["部分","[pɑːrt]"],"place":["地方","[pleɪs]"],"thing":["东西","[θɪŋ]"],"way":["方式","[weɪ]"],
+"time":["时间","[taɪm]"],"day":["天","[deɪ]"],"year":["年","[jɪr]"],"month":["月","[mʌnθ]"],"week":["周","[wiːk]"],
+"hour":["小时","[ˈaʊər]"],"minute":["分钟","[ˈmɪnɪt]"],"moment":["时刻","[ˈmoʊmənt]"],"life":["生活","[laɪf]"],"world":["世界","[wɜːrld]"],
+"work":["工作","[wɜːrk]"],"job":["工作","[dʒɑːb]"],"study":["学习","[ˈstʌdi]"],"learn":["学习","[lɜːrn]"],"teach":["教","[tiːtʃ]"],
+"read":["读","[riːd]"],"write":["写","[raɪt]"],"speak":["说","[spiːk]"],"listen":["听","[ˈlɪsn]"],"look":["看","[lʊk]"],
+"see":["看见","[siː]"],"watch":["观看","[wɑːtʃ]"],"find":["找到","[faɪnd]"],"get":["得到","[ɡet]"],"give":["给","[ɡɪv]"],
+"take":["拿","[teɪk]"],"make":["制作","[meɪk]"],"use":["使用","[juːz]"],"help":["帮助","[help]"],"need":["需要","[niːd]"],
+"want":["想要","[wɑːnt]"],"like":["喜欢","[laɪk]"],"love":["爱","[lʌv]"],"hate":["恨","[heɪt]"],"know":["知道","[noʊ]"],
+"think":["想","[θɪŋk]"],"believe":["相信","[bɪˈliːv]"],"feel":["感觉","[fiːl]"],"become":["成为","[bɪˈkʌm]"],"keep":["保持","[kiːp]"],
+"let":["让","[let]"],"put":["放","[pʊt]"],"set":["设置","[set]"],"grow":["生长","[ɡroʊ]"],"create":["创造","[kriˈeɪt]"],
+"build":["建造","[bɪld]"],"develop":["发展","[dɪˈveləp]"],"improve":["改进","[ɪmˈpruːv]"],"increase":["增加","[ɪnˈkriːs]"],"reduce":["减少","[rɪˈduːs]"],
+"change":["改变","[tʃeɪndʒ]"],"continue":["继续","[kənˈtɪnjuː]"],"start":["开始","[stɑːrt]"],"begin":["开始","[bɪˈɡɪn]"],"stop":["停止","[stɑːp]"],
+"finish":["完成","[ˈfɪnɪʃ]"],"end":["结束","[end]"],"move":["移动","[muːv]"],"live":["生活","[lɪv]"],"die":["死","[daɪ]"],
+"win":["赢","[wɪn]"],"lose":["失去","[luːz]"],"buy":["买","[baɪ]"],"sell":["卖","[sel]"],"pay":["支付","[peɪ]"],
+"cost":["花费","[kɔːst]"],"spend":["花费","[spend]"],"save":["节省","[seɪv]"],"waste":["浪费","[weɪst]"],"carry":["携带","[ˈkæri]"],
+"bring":["带来","[brɪŋ]"],"send":["发送","[send]"],"receive":["收到","[rɪˈsiːv]"],"offer":["提供","[ˈɔːfər]"],"provide":["提供","[prəˈvaɪd]"],
+"support":["支持","[səˈpɔːrt]"],"protect":["保护","[prəˈtekt]"],"prevent":["阻止","[prɪˈvent]"],"avoid":["避免","[əˈvɔɪd]"],"allow":["允许","[əˈlaʊ]"],
+"require":["要求","[rɪˈkwaɪər]"],"include":["包括","[ɪnˈkluːd]"],"contain":["包含","[kənˈteɪn]"],"mean":["意味着","[miːn]"],"matter":["重要","[ˈmætər]"],
+"happen":["发生","[ˈhæpən]"],"appear":["出现","[əˈpɪr]"],"disappear":["消失","[ˌdɪsəˈpɪr]"],"stay":["停留","[steɪ]"],"remain":["保持","[rɪˈmeɪn]"],
+"return":["返回","[rɪˈtɜːrn]"],"arrive":["到达","[əˈraɪv]"],"leave":["离开","[liːv]"],"reach":["到达","[riːtʃ]"],"enter":["进入","[ˈentər]"],
+"exit":["退出","[ˈeɡzɪt]"],"follow":["跟随","[ˈfɑːloʊ]"],"lead":["领导","[liːd]"],"direct":["指导","[dəˈrekt]"],"manage":["管理","[ˈmænɪdʒ]"],
+"control":["控制","[kənˈtroʊl]"],"rule":["统治","[ruːl]"],"govern":["统治","[ˈɡʌvərn]"],"choose":["选择","[tʃuːz]"],"decide":["决定","[dɪˈsaɪd]"],
+"plan":["计划","[plæn]"],"prepare":["准备","[prɪˈper]"],"organize":["组织","[ˈɔːrɡənaɪz]"],"arrange":["安排","[əˈreɪndʒ]"],"solve":["解决","[sɑːlv]"],
+"deal":["处理","[diːl]"],"handle":["处理","[ˈhændl]"],"face":["面对","[feɪs]"],"accept":["接受","[əkˈsept]"],"refuse":["拒绝","[rɪˈfjuːz]"],
+"agree":["同意","[əˈɡriː]"],"disagree":["不同意","[ˌdɪsəˈɡriː]"],"argue":["争论","[ˈɑːrɡjuː]"],"discuss":["讨论","[dɪˈskʌs]"],"talk":["谈话","[tɔːk]"],
+"say":["说","[seɪ]"],"tell":["告诉","[tel]"],"ask":["问","[æsk]"],"answer":["回答","[ˈænsər]"],"reply":["回复","[rɪˈplaɪ]"],
+"explain":["解释","[ɪkˈspleɪn]"],"describe":["描述","[dɪˈskraɪb]"],"show":["展示","[ʃoʊ]"],"test":["测试","[test]"],"check":["检查","[tʃek]"],
+"count":["数","[kaʊnt]"],"compare":["比较","[kəmˈper]"],"connect":["连接","[kəˈnekt]"],"separate":["分开","[ˈseprət]"],"divide":["划分","[dɪˈvaɪd]"],
+"join":["加入","[dʒɔɪn]"],"unite":["联合","[juˈnaɪt]"],"share":["分享","[ʃer]"],"exchange":["交换","[ɪksˈtʃeɪndʒ]"],"trade":["贸易","[treɪd]"],
+"market":["市场","[ˈmɑːrkɪt]"],"business":["生意","[ˈbɪznəs]"],"industry":["工业","[ˈɪndəstri]"],"factory":["工厂","[ˈfæktri]"],"product":["产品","[ˈprɑːdʌkt]"],
+"service":["服务","[ˈsɜːrvɪs]"],"customer":["顾客","[ˈkʌstəmər]"],"money":["钱","[ˈmʌni]"],"price":["价格","[praɪs]"],"quality":["质量","[ˈkwɑːləti]"],
+"quantity":["数量","[ˈkwɑːntəti]"],"size":["尺寸","[saɪz]"],"type":["类型","[taɪp]"],"kind":["种类","[kaɪnd]"],"form":["形式","[fɔːrm]"],
+"shape":["形状","[ʃeɪp]"],"color":["颜色","[ˈkʌlər]"],"light":["光","[laɪt]"],"dark":["黑暗","[dɑːrk]"],"hot":["热的","[hɑːt]"],
+"cold":["冷的","[koʊld]"],"warm":["温暖的","[wɔːrm]"],"cool":["凉爽的","[kuːl]"],"wet":["湿的","[wet]"],"dry":["干的","[draɪ]"],
+"clean":["干净的","[kliːn]"],"dirty":["脏的","[ˈdɜːrti]"],"healthy":["健康的","[ˈhelθi]"],"sick":["生病的","[sɪk]"],"strong":["强壮的","[strɔːŋ]"],
+"weak":["弱的","[wiːk]"],"heavy":["重的","[ˈhevi]"],"deep":["深的","[diːp]"],"wide":["宽的","[waɪd]"],"thin":["薄的","[θɪn]"],
+"thick":["厚的","[θɪk]"],"soft":["软的","[sɔːft]"],"smooth":["光滑的","[smuːð]"],"sharp":["锋利的","[ʃɑːrp]"],"bright":["明亮的","[braɪt]"],
+"quiet":["安静的","[ˈkwaɪət]"],"loud":["响亮的","[laʊd]"],"safe":["安全的","[seɪf]"],"dangerous":["危险的","[ˈdeɪndʒərəs]"],"happy":["快乐的","[ˈhæpi]"],
+"sad":["悲伤的","[sæd]"],"angry":["生气的","[ˈæŋɡri]"],"afraid":["害怕的","[əˈfreɪd]"],"surprised":["惊讶的","[sərˈpraɪzd]"],"tired":["疲倦的","[ˈtaɪərd]"],
+"busy":["忙碌的","[ˈbɪzi]"],"ready":["准备好的","[ˈredi]"],"careful":["小心的","[ˈkerfl]"],"serious":["严肃的","[ˈsɪriəs]"],"famous":["著名的","[ˈfeɪməs]"],
+"popular":["受欢迎的","[ˈpɑːpjələr]"],"successful":["成功的","[səkˈsesfl]"],"rich":["富有的","[rɪtʃ]"],"poor":["贫穷的","[pʊr]"],"beautiful":["美丽的","[ˈbjuːtɪfl]"],
+"ugly":["丑陋的","[ˈʌɡli]"],"nice":["好的","[naɪs]"],"fine":["好的","[faɪn]"],"great":["伟大的","[ɡreɪt]"],"wonderful":["美妙的","[ˈwʌndərfl]"],
+"perfect":["完美的","[ˈpɜːrfɪkt]"],"terrible":["可怕的","[ˈterəbl]"],"awful":["糟糕的","[ˈɔːfl]"],"rare":["稀有的","[rer]"],"usual":["通常的","[ˈjuːʒuəl]"],
+"unusual":["不寻常的","[ʌnˈjuːʒuəl]"],"normal":["正常的","[ˈnɔːrml]"],"natural":["自然的","[ˈnætʃrəl]"],"human":["人类的","[ˈhjuːmən]"],"physical":["身体的","[ˈfɪzɪkl]"],
+"mental":["精神的","[ˈmentl]"],"moral":["道德的","[ˈmɔːrəl]"],"legal":["合法的","[ˈliːɡl]"],"illegal":["非法的","[ɪˈliːɡl]"],"active":["活跃的","[ˈæktɪv]"],
+"negative":["消极的","[ˈneɡətɪv]"],"indirect":["间接的","[ˌɪndəˈrekt]"],"basic":["基本的","[ˈbeɪsɪk]"],"simple":["简单的","[ˈsɪmpl]"],"complex":["复杂的","[kəmˈpleks]"],
+"modern":["现代的","[ˈmɑːdərn]"],"ancient":["古代的","[ˈeɪnʃənt]"],"recent":["最近的","[ˈriːsnt]"],"future":["未来的","[ˈfjuːtʃər]"],"past":["过去的","[pæst]"],
+"present":["现在的","[ˈpreznt]"],"current":["当前的","[ˈkɜːrənt]"],"traditional":["传统的","[trəˈdɪʃənl]"],"international":["国际的","[ˌɪntərˈnæʃnəl]"],"foreign":["外国的","[ˈfɔːrən]"],
+"western":["西方的","[ˈwestərn]"],"eastern":["东方的","[ˈiːstərn]"],"northern":["北方的","[ˈnɔːrðərn]"],"southern":["南方的","[ˈsʌðərn]"],"left":["左边","[left]"],
+"top":["顶部","[tɑːp]"],"bottom":["底部","[ˈbɑːtəm]"],"front":["前面","[frʌnt]"],"middle":["中间","[ˈmɪdl]"],"center":["中心","[ˈsentər]"],
+"side":["侧面","[saɪd]"],"edge":["边缘","[edʒ]"],"corner":["角落","[ˈkɔːrnər]"],"area":["区域","[ˈeriə]"],"region":["地区","[ˈriːdʒən]"],
+"space":["空间","[speɪs]"],"distance":["距离","[ˈdɪstəns]"],"direction":["方向","[dəˈrekʃn]"],"position":["位置","[pəˈzɪʃn]"],"location":["地点","[loʊˈkeɪʃn]"],
+"movement":["运动","[ˈmuːvmənt]"],"action":["行动","[ˈækʃn]"],"activity":["活动","[ækˈtɪvəti]"],"process":["过程","[ˈprɑːses]"],"reason":["原因","[ˈriːzn]"],
+"purpose":["目的","[ˈpɜːrpəs]"],"goal":["目标","[ɡoʊl]"],"aim":["目标","[eɪm]"],"idea":["主意","[aɪˈdiːə]"],"thought":["思想","[θɔːt]"],
+"opinion":["意见","[əˈpɪnjən]"],"view":["观点","[vjuː]"],"belief":["信念","[bɪˈliːf]"],"feeling":["感觉","[ˈfiːlɪŋ]"],"emotion":["情绪","[ɪˈmoʊʃn]"],
+"mood":["心情","[muːd]"],"spirit":["精神","[ˈspɪrɪt]"],"mind":["头脑","[maɪnd]"],"body":["身体","[ˈbɑːdi]"],"head":["头","[hed]"],
+"hand":["手","[hænd]"],"foot":["脚","[fʊt]"],"eye":["眼睛","[aɪ]"],"ear":["耳朵","[ɪr]"],"mouth":["嘴","[maʊθ]"],
+"heart":["心","[hɑːrt]"],"hair":["头发","[her]"],"food":["食物","[fuːd]"],"water":["水","[ˈwɔːtər]"],"air":["空气","[er]"],
+"fire":["火","[ˈfaɪər]"],"earth":["地球","[ɜːrθ]"],"sun":["太阳","[sʌn]"],"moon":["月亮","[muːn]"],"star":["星星","[stɑːr]"],
+"sky":["天空","[skaɪ]"],"sea":["海","[siː]"],"river":["河","[ˈrɪvər]"],"mountain":["山","[ˈmaʊntn]"],"forest":["森林","[ˈfɔːrɪst]"],
+"tree":["树","[triː]"],"flower":["花","[ˈflaʊər]"],"animal":["动物","[ˈænɪml]"],"bird":["鸟","[bɜːrd]"],"fish":["鱼","[fɪʃ]"],
+"cat":["猫","[kæt]"],"dog":["狗","[dɔːɡ]"],"house":["房子","[haʊs]"],"room":["房间","[ruːm]"],"door":["门","[dɔːr]"],
+"window":["窗户","[ˈwɪndoʊ]"],"wall":["墙","[wɔːl]"],"floor":["地板","[flɔːr]"],"roof":["屋顶","[ruːf]"],"garden":["花园","[ˈɡɑːrdn]"],
+"street":["街道","[striːt]"],"road":["路","[roʊd]"],"car":["汽车","[kɑːr]"],"bus":["公共汽车","[bʌs]"],"train":["火车","[treɪn]"],
+"plane":["飞机","[pleɪn]"],"ship":["船","[ʃɪp]"],"bike":["自行车","[baɪk]"],"walk":["走","[wɔːk]"],"run":["跑","[rʌn]"],
+"drive":["驾驶","[draɪv]"],"fly":["飞","[flaɪ]"],"travel":["旅行","[ˈtrævl]"],"trip":["旅行","[trɪp]"],"journey":["旅程","[ˈdʒɜːrni]"],
+"visit":["拜访","[ˈvɪzɪt]"],"meet":["遇见","[miːt]"],"call":["打电话","[kɔːl]"],"phone":["电话","[foʊn]"],"letter":["信","[ˈletər]"],
+"message":["消息","[ˈmesɪdʒ]"],"news":["新闻","[nuːz]"],"information":["信息","[ˌɪnfərˈmeɪʃn]"],"knowledge":["知识","[ˈnɑːlɪdʒ]"],"skill":["技能","[skɪl]"],
+"ability":["能力","[əˈbɪləti]"],"power":["力量","[ˈpaʊər]"],"energy":["能量","[ˈenərdʒi]"],"force":["力量","[fɔːrs]"],"strength":["力量","[streŋθ]"],
+"speed":["速度","[spiːd]"],"rate":["比率","[reɪt]"],"level":["水平","[ˈlevl]"],"total":["总数","[ˈtoʊtl]"],"average":["平均","[ˈævərɪdʒ]"],
+"half":["一半","[hæf]"],"quarter":["四分之一","[ˈkwɔːrtər]"],"double":["双倍","[ˈdʌbl]"],"single":["单个","[ˈsɪŋɡl]"],"million":["百万","[ˈmɪljən]"],
+"thousand":["千","[ˈθaʊznd]"],"hundred":["百","[ˈhʌndrəd]"],"zero":["零","[ˈzɪroʊ]"],"first":["第一","[fɜːrst]"],"second":["第二","[ˈsekənd]"],
+"third":["第三","[θɜːrd]"],"last":["最后","[læst]"],"next":["下一个","[nekst]"],"following":["接下来的","[ˈfɑːloʊɪŋ]"],"above":["在...上","[əˈbʌv]"],
+"below":["在...下","[bɪˈloʊ]"],"beside":["在...旁","[bɪˈsaɪd]"],"behind":["在...后","[bɪˈhaɪnd]"],"beyond":["超过","[bɪˈjɑːnd]"],"across":["穿过","[əˈkrɔːs]"],
+"along":["沿着","[əˈlɔːŋ]"],"around":["围绕","[əˈraʊnd]"],"toward":["朝向","[tɔːrd]"],"against":["反对","[əˈɡenst]"],"without":["没有","[wɪˈðaʊt]"],
+"within":["在...内","[wɪˈðɪn]"],"upon":["在...上","[əˈpɑːn]"],"since":["自从","[sɪns]"],"until":["直到","[ənˈtɪl]"],"while":["当...时","[waɪl]"],
+"although":["虽然","[ɔːlˈðoʊ]"],"though":["虽然","[ðoʊ]"],"however":["然而","[haʊˈevər]"],"therefore":["因此","[ˈðerfɔːr]"],"moreover":["此外","[mɔːrˈoʊvər]"],
+"besides":["此外","[bɪˈsaɪdz]"],"otherwise":["否则","[ˈʌðərwaɪz]"],"instead":["代替","[ɪnˈsted]"],"perhaps":["也许","[pərˈhæps]"],"maybe":["也许","[ˈmeɪbi]"],
+"probably":["可能","[ˈprɑːbəbli]"],"certainly":["当然","[ˈsɜːrtnli]"],"indeed":["确实","[ɪnˈdiːd]"],"actually":["实际上","[ˈæktʃuəli]"],"especially":["尤其","[ɪˈspeʃəli]"],
+"particularly":["特别","[pərˈtɪkjələrli]"],"generally":["一般地","[ˈdʒenrəli]"],"mainly":["主要地","[ˈmeɪnli]"],"mostly":["大多","[ˈmoʊstli]"],"exactly":["确切地","[ɪɡˈzæktli]"],
+"nearly":["几乎","[ˈnɪrli]"],"almost":["几乎","[ˈɔːlmoʊst]"],"hardly":["几乎不","[ˈhɑːrdli]"],"totally":["完全地","[ˈtoʊtəli]"],"completely":["完全地","[kəmˈpliːtli]"],
+"entirely":["完全地","[ɪnˈtaɪərli]"],"absolutely":["绝对地","[ˈæbsəluːtli]"],"definitely":["肯定地","[ˈdefɪnətli]"],"quickly":["快速地","[ˈkwɪkli]"],"slowly":["缓慢地","[ˈsloʊli]"],
+"suddenly":["突然","[ˈsʌdənli]"],"finally":["最后","[ˈfaɪnəli]"],"eventually":["最终","[ɪˈventʃuəli]"],"immediately":["立刻","[ɪˈmiːdiətli]"],"recently":["最近","[ˈriːsntli]"],
+"lately":["最近","[ˈleɪtli]"],"currently":["目前","[ˈkɜːrəntli]"],"originally":["最初","[əˈrɪdʒənəli]"],"successfully":["成功地","[səkˈsesfəli]"],"carefully":["仔细地","[ˈkerfəli]"],
+"seriously":["认真地","[ˈsɪriəsli]"],"widely":["广泛地","[ˈwaɪdli]"],"directly":["直接地","[dəˈrektli]"],"clearly":["清楚地","[ˈklɪrli]"],"simply":["简单地","[ˈsɪmpli]"],
+"easily":["容易地","[ˈiːzəli]"],"highly":["高度地","[ˈhaɪli]"],"deeply":["深深地","[ˈdiːpli]"],"strongly":["强烈地","[ˈstrɔːŋli]"],"fully":["完全地","[ˈfʊli]"],
+"truly":["真正地","[ˈtruːli]"],"really":["真的","[ˈriːəli]"],"quite":["相当","[kwaɪt]"],"fairly":["相当","[ˈferli]"],"either":["或者","[ˈiːðər]"],
+"neither":["也不","[ˈniːðər]"],"nor":["也不","[nɔːr]"],"whether":["是否","[ˈweðər]"],"unless":["除非","[ənˈles]"],"despite":["尽管","[dɪˈspaɪt]"],
+"except":["除了","[ɪkˈsept]"],"including":["包括","[ɪnˈkluːdɪŋ]"],"according":["根据","[əˈkɔːrdɪŋ]"],"based":["基于","[beɪst]"],"due":["由于","[duː]"],
+"own":["自己的","[oʊn]"],"whole":["整个","[hoʊl]"],"various":["各种","[ˈveriəs]"],"several":["几个","[ˈsevrəl]"],"particular":["特定的","[pərˈtɪkjələr]"],
+"specific":["具体的","[spəˈsɪfɪk]"],"similar":["相似的","[ˈsɪmələr]"],"equal":["相等的","[ˈiːkwəl]"],"alike":["相似的","[əˈlaɪk]"],"primary":["主要的","[ˈpraɪmeri]"],
+"secondary":["次要的","[ˈsekənderi]"],"essential":["必要的","[ɪˈsenʃl]"],"necessary":["必要的","[ˈnesəseri]"],"useful":["有用的","[ˈjuːsfl]"],"useless":["无用的","[ˈjuːsləs]"],
+"helpful":["有帮助的","[ˈhelpfl]"],"harmful":["有害的","[ˈhɑːrmfl]"],"valuable":["有价值的","[ˈvæljuəbl]"]
+};
+
+/* ===== 核心逻辑 ===== */
+const PROXY = 'https://corsproxy.io/?';
+function proxied(url){ return PROXY + encodeURIComponent(url); }
+
+const LS_KEY = 'zsb500_dict_v11';
+
+function buildDefaultBook(){
+  const seen = new Set();
+  const clean = [];
+  RAW.forEach(r=>{
+    const k = r[0].toLowerCase();
+    if(seen.has(k)) return;
+    seen.add(k);
+    clean.push(r);
+  });
+  const groups = [];
+  for(let i=0;i<Math.ceil(clean.length/20);i++){
+    const words = [];
+    for(let j=0;j<20;j++){
+      const idx = i*20+j;
+      if(idx >= clean.length) break;
+      const r = clean[idx];
+      words.push({ en:r[0], zh:r[1], phon:r[2], freq:r[3], ex:r[4], exZh:r[5] });
+    }
+    if(words.length) groups.push({ id:'g'+(i+1), name:'第'+(i+1)+'组', words });
+  }
+  return { id:'book_default', name:'专升本500词', groups };
+}
+
+let state = {
+  books: [], currentBookId: null, currentGroupId: null, currentIndex: 0,
+  shuffledOrder: null, isShuffled: false, isPlaying: false, autoTimer: null,
+  viewMode: 'both', listenMode: 'on', listenRepeat: 1, listenIntervalSec: 3,
+  wrongBook: {}, mastery: {}, folders: ['全部','未分组'], askOnMark: false,
+  checkin: {}, checkedGroups: {}, todayGoal: 20,
+  lastResult: { known:[], unknown:[] }, dark: false, soundOn: true,
+  currentGameMode: null, difficulty: 'normal', recycle: [], bestScores: {},
+  gameKnown: [], gameUnknown: [], gameSelectedKeys: null
+};
+
+function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function uid(){ return Date.now()+'-'+Math.random().toString(36).slice(2,8); }
+function esc(s){ if(s==null) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function escAttr(s){ return esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function getBook(){ return state.books.find(b=>b.id===state.currentBookId)||state.books[0]; }
+function getGroup(){ const bk=getBook(); if(!bk) return null; return bk.groups.find(g=>g.id===state.currentGroupId)||bk.groups[0]; }
+function findWordAnywhere(en){
+  const t=(en||'').toLowerCase();
+  for(const bk of state.books) for(const g of bk.groups) for(const w of g.words) if(w.en.toLowerCase()===t) return {book:bk,group:g,word:w};
+  return null;
+}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('show'),1800); }
+
+function save(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      books: state.books, wrongBook: state.wrongBook, mastery: state.mastery,
+      folders: state.folders, askOnMark: state.askOnMark,
+      checkin: state.checkin, checkedGroups: state.checkedGroups, todayGoal: state.todayGoal,
+      listenRepeat: state.listenRepeat, listenIntervalSec: state.listenIntervalSec,
+      lastResult: state.lastResult, dark: state.dark, soundOn: state.soundOn,
+      difficulty: state.difficulty, recycle: state.recycle, bestScores: state.bestScores,
+      gameSelectedKeys: state.gameSelectedKeys,
+      currentBookId: state.currentBookId, currentGroupId: state.currentGroupId
+    }));
+  }catch(e){}
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      state.books = d.books||[];
+      state.wrongBook = d.wrongBook||{};
+      state.mastery = d.mastery||{};
+      state.folders = d.folders||['全部','未分组'];
+      state.askOnMark = !!d.askOnMark;
+      state.checkin = d.checkin||{};
+      state.checkedGroups = d.checkedGroups||{};
+      state.todayGoal = d.todayGoal||20;
+      state.listenRepeat = d.listenRepeat||1;
+      state.listenIntervalSec = d.listenIntervalSec||3;
+      state.lastResult = d.lastResult||{known:[],unknown:[]};
+      state.dark = !!d.dark;
+      state.soundOn = d.soundOn!==false;
+      state.difficulty = d.difficulty||'normal';
+      state.recycle = d.recycle||[];
+      state.bestScores = d.bestScores||{};
+      state.gameSelectedKeys = d.gameSelectedKeys||null;
+      state.currentBookId = d.currentBookId||null;
+      state.currentGroupId = d.currentGroupId||null;
+    }
+  }catch(e){}
+  if(!state.books || !state.books.length) state.books = [buildDefaultBook()];
+  if(!state.folders.includes('全部')) state.folders.unshift('全部');
+  if(!state.folders.includes('未分组')) state.folders.push('未分组');
+  if(!state.currentBookId) state.currentBookId = state.books[0].id;
+  const bk = getBook();
+  if(bk && !state.currentGroupId && bk.groups.length) state.currentGroupId = bk.groups[0].id;
+  if(state.dark) document.body.classList.add('dark');
+}
+
+/* ===== 音效 ===== */
+let audioCtx = null;
+function playBeep(freq, duration, type){
+  if(!state.soundOn) return;
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type||'sine';
+    o.frequency.value = freq||600;
+    g.gain.value = 0.06;
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (duration||0.08));
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + (duration||0.08));
+  }catch(e){}
+}
+function sfxClick(){ playBeep(600,0.06,'sine'); }
+function sfxCorrect(){ playBeep(660,0.09,'triangle'); setTimeout(()=>playBeep(990,0.12,'triangle'),80); }
+function sfxWrong(){ playBeep(220,0.18,'sawtooth'); }
+function sfxWin(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>playBeep(f,0.13,'triangle'), i*100)); }
+function sfxLose(){ [400,330,260,180].forEach((f,i)=>setTimeout(()=>playBeep(f,0.18,'sawtooth'), i*100)); }
+
+/* ===== 发音：优先真人音（有道），回退系统音 ===== */
+let audioUnlocked = false;
+function unlockAudio(){
+  if(audioUnlocked) return;
+  try{
+    if('speechSynthesis' in window){
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      speechSynthesis.speak(u);
+    }
+    audioUnlocked = true;
+  }catch(e){ audioUnlocked = true; }
+}
+document.addEventListener('touchstart', unlockAudio, {once:true});
+document.addEventListener('click', unlockAudio, {once:true});
+
+function speakWord(word, cb){
+  if(!word){ if(cb) cb(); return; }
+  if(state.listenMode==='off'){ if(cb) setTimeout(cb, 200); return; }
+  const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(word) + '&type=1';
+  let finished = false;
+  const done = ()=>{ if(finished) return; finished = true; if(cb) cb(); };
+  try{
+    const audio = new Audio(url);
+    audio.preload = 'auto';
+    audio.onerror = ()=>{ fallbackSpeak(word, done); };
+    const timer = setTimeout(()=>{
+      if(finished) return;
+      try{ audio.pause(); }catch(e){}
+      fallbackSpeak(word, done);
+    }, 3000);
+    audio.onended = ()=>{ clearTimeout(timer); done(); };
+    audio.play().catch(()=>{
+      clearTimeout(timer);
+      fallbackSpeak(word, done);
+    });
+  }catch(e){ fallbackSpeak(word, done); }
+}
+function fallbackSpeak(word, done){
+  if(!('speechSynthesis' in window)){ if(done) done(); return; }
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(word);
+    u.lang = 'en-US';
+    u.rate = 0.9;
+    u.pitch = 1;
+    let finished = false;
+    const fin = ()=>{ if(finished) return; finished = true; if(done) done(); };
+    u.onend = fin;
+    u.onerror = fin;
+    speechSynthesis.speak(u);
+    setTimeout(fin, 2500);
+  }catch(e){ if(done) done(); }
+}
+function speakSentence(text){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.92;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopSpeak(){ try{ speechSynthesis.cancel(); }catch(e){} }
+
+let detailLoopTimer = null, detailLoopCount = 0, detailLoopWord = '', detailLoopTotal = 0, detailLoopInterval = 1;
+function startDetailLoop(word, times, intervalSec){
+  stopDetailLoop();
+  detailLoopWord = word;
+  detailLoopTotal = times || 0;
+  detailLoopInterval = intervalSec || 1;
+  detailLoopCount = 0;
+  showPlayOverlay();
+  const tick = ()=>{
+    detailLoopCount++;
+    if(state.listenMode!=='off') speakWord(word, ()=>{
+      if(detailLoopTotal>0 && detailLoopCount>=detailLoopTotal){
+        detailLoopTimer = setTimeout(()=>{ stopDetailLoop(); }, 800);
+        return;
+      }
+      detailLoopTimer = setTimeout(tick, Math.max(200, detailLoopInterval*1000));
+    });
+    updateOverlayInfo();
+  };
+  tick();
+}
+function stopDetailLoop(){
+  if(detailLoopTimer){ clearTimeout(detailLoopTimer); detailLoopTimer = null; }
+  stopSpeak();
+  hidePlayOverlay();
+}
+function showPlayOverlay(){
+  let ov = document.getElementById('playOverlay');
+  if(!ov){
+    ov = document.createElement('div');
+    ov.id = 'playOverlay';
+    ov.className = 'play-overlay show';
+    document.body.appendChild(ov);
+  }
+  ov.classList.add('show');
+  updateOverlayInfo();
+}
+function hidePlayOverlay(){
+  const ov = document.getElementById('playOverlay');
+  if(ov) ov.classList.remove('show');
+}
+function updateOverlayInfo(){
+  const ov = document.getElementById('playOverlay');
+  if(!ov) return;
+  const total = detailLoopTotal>0 ? ('/ 共 '+detailLoopTotal+' 遍') : '· 无限循环';
+  ov.innerHTML = `
+    <div class="po-info">🔁 反复听：<b>${esc(detailLoopWord)}</b><small>第 ${detailLoopCount} 遍 ${total} · 间隔 ${detailLoopInterval}s</small></div>
+    <button class="po-btn" id="stopLoopBtn">⏹ 停止</button>
+  `;
+  const b = document.getElementById('stopLoopBtn');
+  if(b) b.onclick = ()=>{ sfxClick(); stopDetailLoop(); toast('已停止'); };
+}
+
+/* ===== 打卡写入 ===== */
+function bumpCheckin(){
+  const ds = todayStr();
+  if(!state.checkin[ds]) state.checkin[ds] = { words:0 };
+  state.checkin[ds].words = (state.checkin[ds].words||0) + 1;
+  const bk = getBook(); const g = getGroup();
+  if(bk && g) state.checkedGroups[bk.name+' › '+g.name] = true;
+  save();
+}
+
+/* ===== 听写主流程 ===== */
+function currentPlayList(){
+  const g = getGroup();
+  if(!g) return [];
+  if(state.isShuffled && state.shuffledOrder && state.shuffledOrder.length===g.words.length) return state.shuffledOrder;
+  return g.words;
+}
+function currentWord(){
+  const list = currentPlayList();
+  if(!list.length) return null;
+  if(state.currentIndex>=list.length) state.currentIndex = 0;
+  return list[state.currentIndex];
+}
+function renderDictation(){
+  const list = currentPlayList();
+  const w = currentWord();
+  const enEl=document.getElementById('wordEn'), zhEl=document.getElementById('wordZh'),
+        phonEl=document.getElementById('wordPhon'), freqEl=document.getElementById('wordFreq'),
+        prog=document.getElementById('progTag'), grpN=document.getElementById('curGroupName'),
+        grpB=document.getElementById('curGroupBadge'), mini=document.getElementById('miniProg');
+  enEl.classList.remove('hidden-txt'); zhEl.classList.remove('hidden-txt'); phonEl.classList.remove('hidden-txt');
+  const ordBtn = document.getElementById('orderToggleBtn');
+  ordBtn.textContent = state.isShuffled ? '🔀 乱序' : '➡️ 顺序';
+  if(!w){
+    enEl.textContent = '✨ 暂无单词'; zhEl.textContent = '请选择分组开始听写';
+    phonEl.textContent = ''; freqEl.style.display = 'none';
+    prog.textContent = '0 / 0'; grpN.textContent = '未选择'; grpB.textContent = '0 词'; mini.style.width = '0%';
+    return;
+  }
+  const g = getGroup();
+  grpN.textContent = g ? g.name : '未选择';
+  grpB.textContent = list.length+' 词';
+  prog.textContent = (state.currentIndex+1)+' / '+list.length;
+  mini.style.width = list.length ? ((state.currentIndex+1)/list.length*100)+'%' : '0%';
+  enEl.textContent = w.en;
+  zhEl.textContent = w.zh || '—';
+  phonEl.textContent = w.phon || '';
+  if(w.freq){ freqEl.style.display='inline-block'; freqEl.textContent='🔥 出现 '+w.freq+' 次'; }
+  else freqEl.style.display='none';
+  if(state.viewMode==='en') zhEl.classList.add('hidden-txt');
+  if(state.viewMode==='zh') enEl.classList.add('hidden-txt');
+}
+function speakCurrent(){ const w = currentWord(); if(w) speakWord(w.en); }
+function playToggle(){
+  const list = currentPlayList();
+  if(!list.length){ toast('当前分组无单词'); return; }
+  if(state.isPlaying) stopAutoPlay(); else startAutoPlay();
+}
+function startAutoPlay(){
+  if(!audioUnlocked) unlockAudio();
+  state.isPlaying = true;
+  document.getElementById('playBtn').innerHTML = '⏸ 暂停';
+  playNextLoop();
+}
+function playNextLoop(){
+  if(!state.isPlaying) return;
+  const list = currentPlayList();
+  if(!list.length){ stopAutoPlay(); return; }
+  const w = currentWord();
+  if(!w){ stopAutoPlay(); return; }
+  const times = Math.max(1, state.listenRepeat|0);
+  let i = 0;
+  const repeat = ()=>{
+    i++;
+    speakWord(w.en, ()=>{
+      if(!state.isPlaying) return;
+      if(i < times){ setTimeout(repeat, 600); }
+      else{
+        if(state.currentIndex < list.length-1){
+          state.autoTimer = setTimeout(()=>{
+            if(!state.isPlaying) return;
+            state.currentIndex++;
+            renderDictation();
+            playNextLoop();
+          }, Math.max(1, state.listenIntervalSec)*1000);
+        }else{
+          stopAutoPlay();
+          bumpCheckin();
+          showReviewTable();
+        }
+      }
+    });
+  };
+  repeat();
+}
+function stopAutoPlay(){
+  state.isPlaying = false;
+  const b = document.getElementById('playBtn'); if(b) b.innerHTML = '▶ 开始';
+  if(state.autoTimer){ clearTimeout(state.autoTimer); state.autoTimer = null; }
+  stopSpeak();
+}
+function nextWord(){
+  const list = currentPlayList();
+  if(!list.length) return;
+  if(state.currentIndex < list.length-1){
+    state.currentIndex++; renderDictation();
+    const w = currentWord(); if(w && !state.isPlaying) speakWord(w.en);
+  }else{ stopAutoPlay(); showReviewTable(); }
+}
+function prevWord(){
+  if(state.currentIndex>0){
+    state.currentIndex--; renderDictation();
+    const w = currentWord(); if(w && !state.isPlaying) speakWord(w.en);
+  }else toast('已经是第一个');
+}
+function toggleOrder(){
+  state.isShuffled = !state.isShuffled;
+  if(state.isShuffled){
+    const g = getGroup();
+    if(g){
+      const arr = g.words.slice();
+      for(let i=arr.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+      state.shuffledOrder = arr;
+    }
+  }else state.shuffledOrder = null;
+  state.currentIndex = 0; stopAutoPlay(); renderDictation(); sfxClick();
+  toast(state.isShuffled ? '已切换：乱序' : '已切换：顺序');
+}
+function markWrong(){
+  const w = currentWord(); if(!w){ toast('无单词'); return; }
+  bumpCheckin();
+  state.gameUnknown.push(w);
+  if(state.askOnMark) askFolderFor(w); else addWrongAuto(w);
+  sfxWrong();
+  if(state.currentIndex < currentPlayList().length-1){
+    state.currentIndex++; renderDictation();
+    const nw = currentWord(); if(nw && !state.isPlaying) speakWord(nw.en);
+  }else{ stopAutoPlay(); showReviewTable(); }
+}
+function markStar(){
+  const w = currentWord(); if(!w){ toast('无单词'); return; }
+  state.mastery[w.en.toLowerCase()] = true;
+  Object.keys(state.wrongBook).forEach(f=>{
+    state.wrongBook[f] = state.wrongBook[f].filter(x=>x.en.toLowerCase()!==w.en.toLowerCase());
+  });
+  bumpCheckin();
+  save(); sfxCorrect(); toast('✓ 已标熟练');
+  if(state.currentIndex < currentPlayList().length-1){
+    state.currentIndex++; renderDictation();
+    const nw = currentWord(); if(nw && !state.isPlaying) speakWord(nw.en);
+  }else{ stopAutoPlay(); showReviewTable(); }
+}
+function addWrongAuto(w){
+  const folder = '未分组';
+  if(!state.wrongBook[folder]) state.wrongBook[folder]=[];
+  if(!state.wrongBook[folder].some(x=>x.en.toLowerCase()===w.en.toLowerCase())){
+    state.wrongBook[folder].push({...w});
+    save(); toast('✗ 已加入错题本（未分组）');
+  }
+}
+function askFolderFor(w){
+  const folders = state.folders.filter(f=>f!=='全部'&&f!=='未分组');
+  if(!folders.length){ addWrongAuto(w); return; }
+  showModal('放入哪个夹？', folders.map(f=>`<div class="group-row" data-folder="${escAttr(f)}"><div class="gname">📁 ${esc(f)}</div></div>`).join(''),
+    [{text:'放入未分组', cls:'ghost', fn: ()=>{ addWrongAuto(w); closeModal(); }}],
+    (body)=>{
+      body.querySelectorAll('[data-folder]').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          const f = el.dataset.folder;
+          if(!state.wrongBook[f]) state.wrongBook[f]=[];
+          if(!state.wrongBook[f].some(x=>x.en.toLowerCase()===w.en.toLowerCase())){
+            state.wrongBook[f].push({...w});
+          }
+          save(); closeModal(); toast('已放入 '+f);
+        });
+      });
+    });
+}
+function showReviewTable(){
+  const list = currentPlayList();
+  if(!list.length){ toast('无单词'); return; }
+  const cardsHtml = list.map((w,i)=>`
+    <div style="margin:6px 0;display:flex;flex-direction:column;gap:4px;background:#fff;border-radius:14px;padding:12px 16px;border:1.5px solid #e6eef9;cursor:pointer;" data-ri="${i}">
+      <div style="font-weight:800;color:#1e3a5f;font-size:16px;">${i+1}. ${esc(w.en)}</div>
+      <div style="color:#2d4b6e;font-weight:600;">${esc(w.zh||'')}</div>
+    </div>
+  `).join('');
+  showModal('📋 本轮回顾（共 '+list.length+' 词）', `
+    <div style="font-size:13px;color:#7a8fa8;">点任意卡片 → 查看单词详情</div>
+    ${cardsHtml}
+  `, [
+    {text:'关闭', cls:'ghost', fn: closeModal},
+    {text:'📤 复制', cls:'primary', fn: ()=>{ copyText(list.map((w,i)=>`${i+1}. ${w.en}  ${w.zh}`).join('\n')); }}
+  ], (body)=>{
+    body.querySelectorAll('[data-ri]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const i = +el.dataset.ri;
+        closeModal(); openWordDetail(list[i], getGroup());
+      });
+    });
+  });
+}
+
+/* ===== 弹窗 ===== */
+function showModal(title, html, buttons, onBody){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  const foot = document.getElementById('modalFoot');
+  foot.innerHTML = '';
+  (buttons||[]).forEach(b=>{
+    const btn = document.createElement('button');
+    btn.className = 'btn '+(b.cls||'ghost');
+    btn.textContent = b.text;
+    btn.style.flex = '1';
+    btn.onclick = ()=>{ sfxClick(); b.fn&&b.fn(); };
+    foot.appendChild(btn);
+  });
+  document.getElementById('modalMask').classList.add('show');
+  if(onBody) onBody(document.getElementById('modalBody'));
+}
+function closeModal(){
+  document.getElementById('modalMask').classList.remove('show');
+  stopDetailLoop();
+}
+function openPrompt(title, defVal, cb){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = `<textarea id="promptInput" placeholder="在此输入…">${esc(defVal||'')}</textarea>`;
+  document.getElementById('modalFoot').innerHTML = `
+    <button class="btn ghost" id="pcancel" style="flex:1;">取消</button>
+    <button class="btn primary" id="pok" style="flex:1;">确定</button>
+  `;
+  document.getElementById('modalMask').classList.add('show');
+  setTimeout(()=>document.getElementById('promptInput').focus(), 100);
+  document.getElementById('pcancel').onclick = closeModal;
+  document.getElementById('pok').onclick = ()=>{
+    const v = document.getElementById('promptInput').value.trim();
+    closeModal(); cb(v);
+  };
+}
+
+/* ===== 单词详情 ===== */
+function openWordDetail(w, group){
+  if(!w) return;
+  const isWrong = Object.values(state.wrongBook).some(arr=>arr.some(x=>x.en.toLowerCase()===w.en.toLowerCase()));
+  const isStar = !!state.mastery[w.en.toLowerCase()];
+  let examplesHtml = '';
+  if(w.ex){
+    examplesHtml = `<div class="wd-section-title">📖 例句</div>
+      <div class="wd-example">
+        <div class="ex-en">${buildClickableSentence(w.ex)}</div>
+        <div class="ex-zh">${esc(w.exZh||'')}</div>
+        <div style="margin-top:6px;"><button class="btn ghost sm" id="speakEx">🔊 读整句</button></div>
+      </div>`;
+  }
+  showModal('', `
+    <div class="word-detail-card" style="border:none;padding:0;">
+      <button class="wd-edit-btn" id="wdEditBtn">✎</button>
+      <div class="wd-en" id="wdEnClick">${esc(w.en)} <span style="font-size:20px;color:#7a8fa8;">🔊</span></div>
+      <div class="wd-phon">${esc(w.phon||'')}</div>
+      ${w.freq?`<div class="wd-freq">🔥 出现 ${w.freq} 次</div>`:''}
+      <div class="wd-zh">${esc(w.zh||'')}</div>
+      <div class="wd-actions">
+        <button class="btn ghost sm" id="wdLoop">🔁 反复听</button>
+        <button class="btn ${isStar?'success':'ghost'} sm" id="wdStar">${isStar?'✓ 已熟':'✓ 标熟'}</button>
+        <button class="btn ${isWrong?'warn':'ghost'} sm" id="wdWrong">${isWrong?'已在错题':'✗ 不熟'}</button>
+      </div>
+      ${examplesHtml}
+      <button class="btn danger sm" id="wdDelete" style="margin-top:10px;">🗑️ 删除此单词</button>
+    </div>
+  `, [
+    {text:'返回', cls:'ghost', fn: ()=>{ closeModal(); if(group) openGroupWords(group.id); else renderBooks(); }}
+  ]);
+  document.getElementById('wdEnClick').onclick = ()=>{ sfxClick(); speakWord(w.en); };
+  document.getElementById('wdLoop').onclick = ()=>{
+    sfxClick();
+    showModal('🔁 反复听设置', `
+      <div class="card-title" style="margin:0;">间隔秒数</div>
+      <input type="number" id="loopInt" min="0.3" max="10" step="0.1" value="1">
+      <div class="card-title" style="margin:10px 0 0 0;">次数（0 = 无限）</div>
+      <input type="number" id="loopTimes" min="0" max="100" value="0">
+    `, [
+      {text:'取消', cls:'ghost', fn: closeModal},
+      {text:'开始', cls:'primary', fn: ()=>{
+        const int = Math.max(0.3, +document.getElementById('loopInt').value||1);
+        const times = Math.max(0, +document.getElementById('loopTimes').value||0);
+        state.listenIntervalSec = int; save(); closeModal();
+        setTimeout(()=>startDetailLoop(w.en, times, int), 100);
+      }}
+    ]);
+  };
+  document.getElementById('wdStar').onclick = ()=>{
+    state.mastery[w.en.toLowerCase()] = true;
+    Object.keys(state.wrongBook).forEach(f=>{
+      state.wrongBook[f] = state.wrongBook[f].filter(x=>x.en.toLowerCase()!==w.en.toLowerCase());
+    });
+    save(); sfxCorrect();
+    toast('✓ 已标熟练'); closeModal();
+    if(group) openGroupWords(group.id);
+  };
+  document.getElementById('wdWrong').onclick = ()=>{
+    addWrongAuto(w); sfxWrong();
+    closeModal(); if(group) openGroupWords(group.id);
+  };
+  document.getElementById('wdDelete').onclick = ()=>{
+    if(!confirm('删除 '+w.en+'（'+(w.zh||'')+'）？')) return;
+    if(group){
+      group.words = group.words.filter(x=>x.en!==w.en);
+      state.recycle.push({...w, fromBook:getBook()?getBook().id:null, fromGroup:group.id});
+      save(); closeModal(); openGroupWords(group.id); toast('已删除');
+    }else toast('此词不在词书中');
+  };
+  document.getElementById('wdEditBtn').onclick = ()=>{
+    openPrompt('编辑单词（英文 | 中文）', w.en+' | '+(w.zh||''), (v)=>{
+      if(!v) return;
+      const parts = v.split('|').map(s=>s.trim());
+      if(parts[0]) w.en = parts[0];
+      if(parts[1]) w.zh = parts[1];
+      save(); closeModal(); openWordDetail(w, group); toast('已更新');
+    });
+  };
+  const ex = document.getElementById('speakEx');
+  if(ex) ex.onclick = ()=>{ sfxClick(); speakSentence(w.ex); };
+  bindClickableWords(document.getElementById('modalBody'));
+}
+function buildClickableSentence(sentence){
+  return sentence.split(/(\s+)/).map(part=>{
+    if(/^\s+$/.test(part)) return part;
+    const clean = part.replace(/[.,!?;:'"()\[\]{}]/g,'');
+    if(!clean) return esc(part);
+    return `<span class="clickable-word" data-w="${escAttr(clean.toLowerCase())}">${esc(part)}</span>`;
+  }).join('');
+}
+function bindClickableWords(root){
+  document.querySelectorAll('.mini-word-card').forEach(c=>c.remove());
+  root.querySelectorAll('.clickable-word').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.mini-word-card').forEach(c=>c.remove());
+      const word = el.dataset.w;
+      sfxClick();
+      const entry = EX_DICT[word];
+      const rect = el.getBoundingClientRect();
+      const card = document.createElement('div');
+      card.className = 'mini-word-card';
+      card.style.left = Math.min(rect.left, window.innerWidth-300) + 'px';
+      card.style.top = (rect.bottom + 8) + 'px';
+      card.innerHTML = `
+        <div class="mc-en">${esc(word)}</div>
+        ${entry?`<div class="mc-phon">${esc(entry[1])}</div>`:'<div class="mc-phon">/ -- /</div>'}
+        <div class="mc-zh">${entry?esc(entry[0]):'（未收录）'}</div>
+      `;
+      document.body.appendChild(card);
+      const closer = (ev)=>{
+        if(!card.contains(ev.target)){ card.remove(); document.removeEventListener('click', closer); }
+      };
+      setTimeout(()=>document.addEventListener('click', closer), 10);
+    });
+  });
+}
+
+/* ===== 词书 ===== */
+function renderBooks(){
+  document.getElementById('bookTag').textContent = getBook()?.name || '词书';
+  const grid = document.getElementById('booksGrid');
+  if(!state.books.length){ grid.innerHTML = '<div class="empty">还没有词书，点右上角导入</div>'; return; }
+  grid.innerHTML = state.books.map(b=>{
+    let total = 0;
+    b.groups.forEach(g=>total += g.words.length);
+    const done = b.groups.reduce((s,g)=>s+g.words.filter(w=>state.mastery[w.en.toLowerCase()]).length, 0);
+    const pct = total ? Math.round(done/total*100) : 0;
+    return `<div class="book-card" data-book="${b.id}">
+      <div class="bname">${esc(b.name)}</div>
+      <div class="bmeta">${b.groups.length} 组 · ${total} 词</div>
+      <div class="bmeta">✅ 熟练 ${done}</div>
+      <div class="bprog"><i style="width:${pct}%"></i></div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('[data-book]').forEach(el=>{
+    el.addEventListener('click', ()=>{ sfxClick(); openBook(el.dataset.book); });
+  });
+}
+function openBook(bid){
+  state.currentBookId = bid;
+  const bk = getBook();
+  if(bk && bk.groups.length) state.currentGroupId = bk.groups[0].id;
+  state.currentIndex = 0; state.shuffledOrder = null; state.isShuffled = false;
+  save(); renderBookGroups();
+}
+function renderBookGroups(){
+  const bk = getBook();
+  if(!bk) return;
+  const html = bk.groups.map(g=>`
+    <div class="group-row" data-gid="${g.id}">
+      <div class="gname">${esc(g.name)}</div>
+      <div class="gnum">${g.words.length} 词</div>
+    </div>
+  `).join('') || '<div class="empty">暂无分组</div>';
+  showModal('📖 '+bk.name, `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+      <button class="btn primary sm" id="viewAllBtn">👁️ 查看全部</button>
+      <button class="btn ghost sm" id="addGroupBtn">+ 新建分组</button>
+      <button class="btn ghost sm" id="bookSetBtn">⚙️ 词书设置</button>
+    </div>
+    <div class="groups-list">${html}</div>
+  `, [
+    {text:'返回', cls:'ghost', fn: ()=>{ closeModal(); renderBooks(); }}
+  ], (body)=>{
+    body.querySelector('#viewAllBtn').onclick = ()=>{ sfxClick(); closeModal(); openAllWordsView(); };
+    body.querySelector('#addGroupBtn').onclick = ()=>{ sfxClick(); openPrompt('新建分组名称','例如：第26组',(v)=>{
+      if(!v) return;
+      bk.groups.push({id:'g_'+uid(), name:v, words:[]});
+      save(); closeModal(); renderBookGroups();
+    }); };
+    body.querySelector('#bookSetBtn').onclick = ()=>{ sfxClick(); closeModal(); openBookSettings(); };
+    body.querySelectorAll('[data-gid]').forEach(el=>{
+      el.addEventListener('click', ()=>{ sfxClick(); closeModal(); openGroupWords(el.dataset.gid); });
+    });
+  });
+}
+function openBookSettings(){
+  const bk = getBook();
+  if(!bk) return;
+  showModal('⚙️ 词书设置', `
+    <div class="card-title" style="margin:0;">词书名称</div>
+    <input type="text" id="setBookName" value="${esc(bk.name)}">
+    <div class="card-title" style="margin:10px 0 0 0;">每组词数</div>
+    <input type="number" id="setGroupSize" min="5" max="100" value="${bk.groups[0]?.words.length||20}">
+    <div style="font-size:12px;color:#a5b6c9;">改完点"重新分组"生效</div>
+  `, [
+    {text:'取消', cls:'ghost', fn: closeModal},
+    {text:'重新分组', cls:'warn', fn: ()=>{
+      const size = Math.max(5, +document.getElementById('setGroupSize').value||20);
+      const all = [];
+      bk.groups.forEach(g=>all.push(...g.words));
+      bk.groups = [];
+      for(let i=0;i<all.length;i+=size){
+        const words = all.slice(i, i+size);
+        bk.groups.push({ id:'g_'+uid(), name:'第'+(bk.groups.length+1)+'组', words });
+      }
+      bk.name = document.getElementById('setBookName').value.trim() || bk.name;
+      save(); closeModal(); renderBookGroups(); toast('已重新分组');
+    }},
+    {text:'保存名称', cls:'primary', fn: ()=>{
+      bk.name = document.getElementById('setBookName').value.trim() || bk.name;
+      save(); closeModal(); renderBookGroups(); toast('已保存');
+    }}
+  ]);
+}
+
+let currentSort = 'default';
+let maskMode = 'off';
+function openGroupWords(gid){
+  const bk = getBook();
+  const g = bk.groups.find(x=>x.id===gid);
+  if(!g) return;
+  state.currentGroupId = g.id;
+  function renderList(){
+    let arr = g.words.slice();
+    if(currentSort==='alpha') arr.sort((a,b)=>a.en.localeCompare(b.en));
+    else if(currentSort==='freq') arr.sort((a,b)=>(b.freq||0)-(a.freq||0));
+    const body = document.getElementById('modalBody');
+    const listEl = body.querySelector('#gwList');
+    if(!listEl) return;
+    const wrapCls = maskMode==='en' ? 'mask-en' : (maskMode==='zh' ? 'mask-zh' : '');
+    if(!arr.length){ listEl.innerHTML = '<div class="empty">暂无单词，点上方"批量加词"</div>'; return; }
+    listEl.className = 'wordlist '+wrapCls;
+    listEl.innerHTML = arr.map(w=>{
+      const isWrong = Object.values(state.wrongBook).some(a=>a.some(x=>x.en.toLowerCase()===w.en.toLowerCase()));
+      return `<div class="wrow ${isWrong?'mark-wrong':''}" data-en="${escAttr(w.en)}">
+        <div class="wen">${esc(w.en)}</div>
+        ${w.freq?`<div class="wfreq">🔥${w.freq}</div>`:''}
+        <div class="wzh">${esc(w.zh||'')}</div>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('[data-en]').forEach(el=>{
+      const w = g.words.find(x=>x.en===el.dataset.en);
+      el.addEventListener('click', (e)=>{
+        if(e.target.classList.contains('wen')){ sfxClick(); speakWord(w.en); return; }
+        sfxClick(); closeModal(); openWordDetail(w, g);
+      });
+      let lp;
+      el.addEventListener('touchstart', ()=>{ lp = setTimeout(()=>{
+        if(confirm('删除 '+w.en+'（'+(w.zh||'')+'）？')){
+          g.words = g.words.filter(x=>x.en!==w.en);
+          state.recycle.push({...w, fromBook:bk.id, fromGroup:g.id});
+          save(); renderList();
+        }
+      }, 700); });
+      el.addEventListener('touchend', ()=>clearTimeout(lp));
+      el.addEventListener('touchmove', ()=>clearTimeout(lp));
+    });
+  }
+  showModal('📂 '+g.name+'（'+g.words.length+' 词）', `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+      <button class="btn ghost sm" data-sort="default">默认</button>
+      <button class="btn ghost sm" data-sort="alpha">🔤 字母</button>
+      <button class="btn ghost sm" data-sort="freq">🔥 考频</button>
+      <button class="btn primary sm" id="startThisGroup">▶ 听写本组</button>
+      <button class="btn ghost sm" id="addWordsBtn">+ 批量加词</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+      <span style="font-size:13px;color:#7a8fa8;align-self:center;">遮住：</span>
+      <button class="btn ghost sm" data-mask="off">关闭</button>
+      <button class="btn ghost sm" data-mask="en">遮英文</button>
+      <button class="btn ghost sm" data-mask="zh">遮中文</button>
+    </div>
+    <div class="wordlist" id="gwList" style="max-height:50vh;"></div>
+  `, [
+    {text:'返回词书', cls:'ghost', fn: ()=>{ closeModal(); renderBookGroups(); }}
+  ], (body)=>{
+    body.querySelectorAll('[data-sort]').forEach(b=>{
+      if(b.dataset.sort===currentSort) b.classList.add('active-sort');
+      b.onclick = ()=>{ sfxClick(); currentSort = b.dataset.sort; renderList();
+        body.querySelectorAll('[data-sort]').forEach(x=>x.classList.remove('active-sort'));
+        b.classList.add('active-sort');
+      };
+    });
+    body.querySelectorAll('[data-mask]').forEach(b=>{
+      if(b.dataset.mask===maskMode) b.classList.add('active-sort');
+      b.onclick = ()=>{ sfxClick(); maskMode = b.dataset.mask; renderList();
+        body.querySelectorAll('[data-mask]').forEach(x=>x.classList.remove('active-sort'));
+        b.classList.add('active-sort');
+      };
+    });
+    body.querySelector('#startThisGroup').onclick = ()=>{
+      sfxClick();
+      state.currentGroupId = g.id; state.currentIndex = 0;
+      state.shuffledOrder = null; state.isShuffled = false;
+      closeModal(); switchPage('dictation'); renderDictation();
+    };
+    body.querySelector('#addWordsBtn').onclick = ()=>{
+      openPrompt('批量加词（每行：英文 中文）','例如：\nhello 你好\nworld 世界', v=>{
+        if(!v) return;
+        const parsed = parseWordsText(v);
+        if(!parsed.length){ toast('没解析到'); return; }
+        parsed.forEach(p=>g.words.push(p));
+        save(); closeModal(); openGroupWords(g.id); toast('已添加 '+parsed.length+' 词');
+      });
+    };
+    renderList();
+  });
+}
+function openAllWordsView(){
+  const bk = getBook();
+  if(!bk) return;
+  const all = [];
+  bk.groups.forEach(g=>all.push(...g.words));
+  let sort = 'default', mask = 'off';
+  function render(){
+    let arr = all.slice();
+    if(sort==='alpha') arr.sort((a,b)=>a.en.localeCompare(b.en));
+    else if(sort==='freq') arr.sort((a,b)=>(b.freq||0)-(a.freq||0));
+    const body = document.getElementById('modalBody');
+    const listEl = body.querySelector('#allWordsList');
+    if(!listEl) return;
+    const wrapCls = mask==='en' ? 'mask-en' : (mask==='zh' ? 'mask-zh' : '');
+    if(!arr.length){ listEl.innerHTML = '<div class="empty">暂无单词</div>'; return; }
+    listEl.className = 'wordlist '+wrapCls;
+    listEl.innerHTML = arr.map(w=>`
+      <div class="wrow" data-en="${escAttr(w.en)}">
+        <div class="wen">${esc(w.en)}</div>
+        ${w.freq?`<div class="wfreq">🔥${w.freq}</div>`:''}
+        <div class="wzh">${esc(w.zh||'')}</div>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('[data-en]').forEach(el=>{
+      const w = all.find(x=>x.en===el.dataset.en);
+      el.addEventListener('click', (e)=>{
+        if(e.target.classList.contains('wen')){ sfxClick(); speakWord(w.en); return; }
+        sfxClick(); closeModal(); openWordDetail(w, null);
+      });
+    });
+  }
+  showModal('📚 全部单词（'+all.length+'）', `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+      <button class="btn ghost sm" data-sort="default">默认</button>
+      <button class="btn ghost sm" data-sort="alpha">🔤 字母</button>
+      <button class="btn ghost sm" data-sort="freq">🔥 考频</button>
+      <button class="btn primary sm" id="allListenBtn">▶ 全部听写</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+      <span style="font-size:13px;color:#7a8fa8;align-self:center;">遮住：</span>
+      <button class="btn ghost sm" data-mask="off">关闭</button>
+      <button class="btn ghost sm" data-mask="en">遮英文</button>
+      <button class="btn ghost sm" data-mask="zh">遮中文</button>
+    </div>
+    <div class="wordlist" id="allWordsList" style="max-height:55vh;"></div>
+  `, [
+    {text:'返回', cls:'ghost', fn: ()=>{ closeModal(); renderBookGroups(); }}
+  ], (body)=>{
+    body.querySelectorAll('[data-sort]').forEach(b=>{
+      if(b.dataset.sort===sort) b.classList.add('active-sort');
+      b.onclick = ()=>{ sfxClick(); sort = b.dataset.sort; render();
+        body.querySelectorAll('[data-sort]').forEach(x=>x.classList.remove('active-sort'));
+        b.classList.add('active-sort');
+      };
+    });
+    body.querySelectorAll('[data-mask]').forEach(b=>{
+      if(b.dataset.mask===mask) b.classList.add('active-sort');
+      b.onclick = ()=>{ sfxClick(); mask = b.dataset.mask; render();
+        body.querySelectorAll('[data-mask]').forEach(x=>x.classList.remove('active-sort'));
+        b.classList.add('active-sort');
+      };
+    });
+    body.querySelector('#allListenBtn').onclick = ()=>{
+      sfxClick();
+      let tmp = state.books.find(b=>b.id==='__all__');
+      if(!tmp){ tmp = { id:'__all__', name:'全部听写', groups:[] }; state.books.push(tmp); }
+      tmp.groups = [{ id:'__all_g__', name:'全部', words: all }];
+      state.currentBookId = tmp.id;
+      state.currentGroupId = tmp.groups[0].id;
+      state.currentIndex = 0;
+      state.shuffledOrder = null; state.isShuffled = false;
+      save(); closeModal(); switchPage('dictation'); renderDictation();
+    };
+    render();
+  });
+}
+function parseWordsText(text){
+  const out = []; const seen = new Set();
+  text.split(/\r?\n/).forEach(line=>{
+    line = line.trim(); if(!line) return;
+    let en='', zh='';
+    const m = line.match(/^([^,\s=]+)\s*[,=\s]\s*(.+)$/);
+    if(m){ en=m[1].trim(); zh=m[2].trim(); }
+    else{ const p=line.split(/\s+/); en=p[0]; zh=p.slice(1).join(' ')||'—'; }
+    if(!en) return;
+    const k = en.toLowerCase(); if(seen.has(k)) return;
+    seen.add(k);
+    out.push({ en, zh: zh||'—' });
+  });
+  return out;
+}
+
+/* ===== 回收站 ===== */
+function openRecycle(){
+  const html = state.recycle.length ? state.recycle.map((w,i)=>`
+    <div class="recycle-item">
+      <div class="ren">${esc(w.en)}</div>
+      <div class="rzh">${esc(w.zh||'')}</div>
+      <button class="btn ghost sm" data-ri="${i}">恢复</button>
+      <button class="btn danger sm" data-del="${i}">删</button>
+    </div>
+  `).join('') : '<div class="empty">回收站是空的</div>';
+  showModal('🗑️ 回收站', html, [
+    {text:'清空全部', cls:'danger', fn: ()=>{
+      if(!confirm('彻底清空？不可恢复')) return;
+      state.recycle = []; save(); closeModal();
+    }},
+    {text:'关闭', cls:'primary', fn: closeModal}
+  ], (body)=>{
+    body.querySelectorAll('[data-ri]').forEach(b=>{
+      b.onclick = ()=>{
+        const i = +b.dataset.ri; const w = state.recycle[i];
+        const bk = state.books.find(x=>x.id===w.fromBook) || state.books[0];
+        let g = bk.groups.find(x=>x.id===w.fromGroup) || bk.groups[0];
+        if(!g){ g = {id:'g_'+uid(), name:'恢复组', words:[]}; bk.groups.push(g); }
+        g.words.push({ en:w.en, zh:w.zh, phon:w.phon, freq:w.freq, ex:w.ex, exZh:w.exZh });
+        state.recycle.splice(i,1); save(); closeModal(); toast('已恢复');
+      };
+    });
+    body.querySelectorAll('[data-del]').forEach(b=>{
+      b.onclick = ()=>{ state.recycle.splice(+b.dataset.del,1); save(); closeModal(); };
+    });
+  });
+}
+
+/* ===== 错题本 ===== */
+let wrongType = 'wrong';
+function renderWrongBook(){
+  const wrap = document.getElementById('wrongGroups');
+  if(wrongType==='wrong'){
+    let total = 0;
+    Object.values(state.wrongBook).forEach(arr=>total += arr.length);
+    document.getElementById('wrongCount').textContent = total+' 词';
+    let html = '';
+    html += `<div class="group-row" data-folder="__ALL__"><div class="gname">📂 全部</div><div class="gnum">${total} 词</div></div>`;
+    if(state.wrongBook['未分组']) html += `<div class="group-row" data-folder="未分组"><div class="gname">📁 未分组</div><div class="gnum">${state.wrongBook['未分组'].length} 词</div></div>`;
+    state.folders.forEach(f=>{
+      if(f==='全部' || f==='未分组') return;
+      const c = state.wrongBook[f]?.length || 0;
+      html += `<div class="group-row" data-folder="${escAttr(f)}"><div class="gname">📁 ${esc(f)}</div><div class="gnum">${c} 词</div></div>`;
+    });
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('[data-folder]').forEach(el=>{
+      el.addEventListener('click', ()=>{ sfxClick(); showFolderWords(el.dataset.folder); });
+    });
+  }else{
+    const list = [];
+    state.books.forEach(b=>b.groups.forEach(g=>g.words.forEach(w=>{
+      if(state.mastery[w.en.toLowerCase()]) list.push(w);
+    })));
+    document.getElementById('wrongCount').textContent = list.length+' 词';
+    if(!list.length){ wrap.innerHTML='<div class="empty">还没有熟练词</div>'; return; }
+    wrap.innerHTML = `<div class="wordlist">`+list.map(w=>`
+      <div class="wrow" data-en="${escAttr(w.en)}">
+        <div class="wen">${esc(w.en)}</div>
+        ${w.freq?`<div class="wfreq">🔥${w.freq}</div>`:''}
+        <div class="wzh">${esc(w.zh||'')}</div>
+      </div>
+    `).join('')+`</div>`;
+    wrap.querySelectorAll('[data-en]').forEach(el=>{
+      const w = list.find(x=>x.en===el.dataset.en);
+      el.onclick = ()=>{ sfxClick(); openWordDetail(w, null); };
+    });
+  }
+}
+function showFolderWords(folder){
+  let words = [];
+  if(folder==='__ALL__') Object.values(state.wrongBook).forEach(arr=>words.push(...arr));
+  else words = state.wrongBook[folder] || [];
+  if(!words.length){ toast('该夹暂无词'); return; }
+  const html = words.map((w,i)=>`
+    <div class="wrow" data-wi="${i}">
+      <div class="wen">${esc(w.en)}</div>
+      ${w.freq?`<div class="wfreq">🔥${w.freq}</div>`:''}
+      <div class="wzh">${esc(w.zh||'')}</div>
+    </div>
+  `).join('');
+  showModal('📁 '+(folder==='__ALL__'?'全部':folder)+'（'+words.length+'）', `
+    ${folder!=='__ALL__' ? `<div style="display:flex;gap:6px;"><button class="btn danger sm" id="delFolder">删除此夹</button><button class="btn ghost sm" id="renameFolder">重命名</button></div>`:''}
+    <div class="wordlist" style="max-height:60vh;">${html}</div>
+  `, [
+    {text:'关闭', cls:'ghost', fn: closeModal}
+  ], (body)=>{
+    body.querySelectorAll('[data-wi]').forEach(el=>{
+      const w = words[+el.dataset.wi];
+      el.onclick = ()=>{ sfxClick(); closeModal(); openWordDetail(w, null); };
+    });
+    if(folder!=='__ALL__'){
+      body.querySelector('#delFolder').onclick = ()=>{
+        if(!confirm('删除夹「'+folder+'」？里面的词会留在"全部"区')) return;
+        delete state.wrongBook[folder];
+        state.folders = state.folders.filter(f=>f!==folder);
+        save(); closeModal(); renderWrongBook();
+      };
+      body.querySelector('#renameFolder').onclick = ()=>{
+        openPrompt('重命名夹', folder, (v)=>{
+          if(!v||v===folder) return;
+          state.wrongBook[v] = state.wrongBook[folder];
+          delete state.wrongBook[folder];
+          state.folders = state.folders.map(f=>f===folder?v:f);
+          save(); closeModal(); renderWrongBook();
+        });
+      };
+    }
+  });
+}
+
+/* ===== 查词 ===== */
+async function doSearch(){
+  const q = document.getElementById('searchInput').value.trim();
+  if(!q) return;
+  const box = document.getElementById('searchResult');
+  const local = findWordAnywhere(q);
+  if(local){
+    const w = local.word;
+    box.innerHTML = `
+      <div class="sr-word">${esc(w.en)} <button class="btn ghost sm" id="srSpeak">🔊</button>${w.freq?`<span class="sr-freq">🔥 ${w.freq} 次</span>`:''}</div>
+      ${w.phon?`<div class="sr-phon">${esc(w.phon)}</div>`:''}
+      <div class="sr-def">${esc(w.zh||'—')}</div>
+      ${w.ex?`
+        <div class="sr-ex">
+          <div class="ex-en">${esc(w.ex)}</div>
+          <div class="ex-zh">${esc(w.exZh||'')}</div>
+          <div style="margin-top:6px;"><button class="btn ghost sm" id="srExSpeak">🔊 读整句</button></div>
+        </div>
+      `:''}
+      <div style="font-size:12px;color:#9aabbf;margin-top:6px;">✅ 来自词书</div>
+    `;
+    document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(w.en); };
+    const exBtn = document.getElementById('srExSpeak');
+    if(exBtn) exBtn.onclick = ()=>{ sfxClick(); speakSentence(w.ex); };
+    return;
+  }
+  box.innerHTML = `
+    <div class="empty">
+      ⏳ 词书里没有「${esc(q)}」<br>
+      <span style="font-size:13px;color:#9aabbf;">正在联网查询…（最多等 8 秒）</span>
+    </div>
+  `;
+  let data = null;
+  try{
+    const rawUrl = 'https://dict.youdao.com/jsonapi?q='+encodeURIComponent(q);
+    const controller = new AbortController();
+    const timer = setTimeout(()=>controller.abort(), 8000);
+    const res = await fetch(proxied(rawUrl), { signal: controller.signal });
+    clearTimeout(timer);
+    const json = await res.json();
+    data = parseYoudao(json, q);
+  }catch(e){ data = null; }
+  if(!data){
+    box.innerHTML = `
+      <div class="empty">
+        ❌ 未找到「${esc(q)}」<br>
+        <span style="font-size:13px;color:#9aabbf;">联网超时或未收录，请检查网络后重试</span>
+      </div>
+    `;
+    return;
+  }
+  box.innerHTML = `
+    <div class="sr-word">${esc(data.word)} <button class="btn ghost sm" id="srSpeak">🔊</button></div>
+    ${data.phon?`<div class="sr-phon">${esc(data.phon)}</div>`:''}
+    <div class="sr-def">${esc(data.def||'—')}</div>
+    ${(data.examples||[]).map((ex,i)=>`
+      <div class="sr-ex">
+        <div class="ex-en">${esc(ex.en)}</div>
+        <div class="ex-zh">${esc(ex.zh||'')}</div>
+        <div style="margin-top:6px;"><button class="btn ghost sm" data-sx="${i}">🔊 读整句</button></div>
+      </div>
+    `).join('')}
+    <div style="font-size:12px;color:#9aabbf;margin-top:6px;">🌐 来自联网（有道）</div>
+  `;
+  document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(data.word); };
+  box.querySelectorAll('[data-sx]').forEach(b=>{
+    b.onclick = ()=>{ sfxClick(); speakSentence(data.examples[+b.dataset.sx].en); };
+  });
+}
+function parseYoudao(json, q){
+  try{
+    const w0 = json.ec?.word?.[0];
+    const word = w0?.returnPhrase?.[0] || q;
+    let phon = '';
+    if(w0?.usphone) phon = '/'+w0.usphone+'/';
+    else if(w0?.ukphone) phon = '/'+w0.ukphone+'/';
+    let def = '';
+    if(w0?.trs) def = w0.trs.map(t=>t.tr?.[0]?.l?.i?.[0]||'').filter(Boolean).join('；');
+    else if(json.fanyi?.translation?.[0]) def = json.fanyi.translation[0];
+    const examples = [];
+    if(json.blng_sents_part?.['sentence-pair']){
+      json.blng_sents_part['sentence-pair'].slice(0,3).forEach(sp=>{
+        if(sp.sentence) examples.push({ en: sp.sentence, zh: sp.sentence_translation||'' });
+      });
+    }
+    if(!def && !phon && !examples.length) return null;
+    return { word, phon: phon || '', def: def || '（无释义）', examples };
+  }catch(e){ return null; }
+}
+
+/* ===== 打卡日历 ===== */
+function renderCheckin(){
+  const today = todayStr();
+  const d = new Date(); const year = d.getFullYear(), month = d.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const grid = document.getElementById('checkinGrid');
+  if(!grid) return;
+  const headers = ['日','一','二','三','四','五','六'].map(h=>`<div style="font-size:10px;color:#9aabbf;text-align:center;font-weight:600;padding:3px 0;">${h}</div>`).join('');
+  let cells = '';
+  for(let i=0;i<firstDay;i++) cells += '<div></div>';
+  for(let day=1;day<=daysInMonth;day++){
+    const ds = year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    const info = state.checkin[ds];
+    const done = info && info.words > 0;
+    const isToday = ds===today;
+    cells += `<div class="ci-day ${done?'done':''} ${isToday?'today':''}"><div class="dnum">${day}</div><div class="dmark">${done?'✓':''}</div></div>`;
+  }
+  grid.innerHTML = headers + cells;
+}
+function calcStreak(){
+  let s=0; const d=new Date();
+  while(true){
+    const ds = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const info = state.checkin[ds];
+    if(info && (info.words||0) > 0){ s++; d.setDate(d.getDate()-1); }
+    else break;
+    if(s>365) break;
+  }
+  return s;
+}
+
+/* ===== 游戏选择 ===== */
+function openGameSelect(){
+  const items = [];
+  state.books.forEach(b=>b.groups.forEach(g=>{
+    const k = b.name+' › '+g.name;
+    items.push({ key:k, label:b.name+' › '+g.name, count:g.words.length });
+  }));
+  const html = items.map(it=>`<div class="group-row" data-gk="${escAttr(it.key)}"><div class="gname">${esc(it.label)}</div><div class="gnum">${it.count} 词</div></div>`).join('');
+  const selected = new Set(state.gameSelectedKeys||[]);
+  showModal('选择词书/分组', `<div style="font-size:13px;color:#7a8fa8;">点分组加入游戏队列（可多选）</div>${html}`, [
+    {text:'取消', cls:'ghost', fn: closeModal},
+    {text:'确定', cls:'primary', fn: ()=>{
+      state.gameSelectedKeys = selected.size ? Array.from(selected) : null;
+      document.getElementById('gameSelectedInfo').textContent = selected.size ? ('已选 '+selected.size+' 组') : '未选择（默认当前分组）';
+      save();
+      closeModal();
+    }}
+  ], (body)=>{
+    body.querySelectorAll('[data-gk]').forEach(el=>{
+      if(selected.has(el.dataset.gk)) el.classList.add('selected');
+      el.onclick = ()=>{
+        sfxClick();
+        const k = el.dataset.gk;
+        if(selected.has(k)){ selected.delete(k); el.classList.remove('selected'); }
+        else { selected.add(k); el.classList.add('selected'); }
+      };
+    });
+  });
+}
+function buildGameQueue(){
+  const pool = [];
+  if(state.gameSelectedKeys && state.gameSelectedKeys.length){
+    state.gameSelectedKeys.forEach(k=>{
+      state.books.forEach(b=>b.groups.forEach(g=>{
+        if(b.name+' › '+g.name === k) pool.push(...g.words);
+      }));
+    });
+  }else{
+    const g = getGroup(); if(g) pool.push(...g.words);
+  }
+  const filtered = pool.filter(w=>!state.mastery[w.en.toLowerCase()]);
+  const seen = new Set(); const out = [];
+  filtered.forEach(w=>{ const k=w.en.toLowerCase(); if(!seen.has(k)){ seen.add(k); out.push(w); } });
+  return out;
+}
+function endGame(score, extra, extraLabel){
+  const best = state.bestScores[state.currentGameMode] || 0;
+  if(score > best){ state.bestScores[state.currentGameMode] = score; save(); }
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultBest').textContent = state.bestScores[state.currentGameMode] || 0;
+  document.getElementById('resultExtra').textContent = extra;
+  document.getElementById('resultExtraLabel').textContent = extraLabel || '额外';
+  document.getElementById('resultKnownCount').textContent = state.gameKnown.length;
+  document.getElementById('resultUnknownCount').textContent = state.gameUnknown.length;
+  const kl = document.getElementById('resultKnownList');
+  const ul = document.getElementById('resultUnknownList');
+  kl.innerHTML = state.gameKnown.length ? state.gameKnown.map(w=>`<div class="result-row" data-en="${escAttr(w.en)}"><div class="ren">${esc(w.en)}</div><div class="rzh">${esc(w.zh||'')}</div></div>`).join('') : '<div class="empty">无</div>';
+  ul.innerHTML = state.gameUnknown.length ? state.gameUnknown.map(w=>`<div class="result-row" data-en="${escAttr(w.en)}"><div class="ren">${esc(w.en)}</div><div class="rzh">${esc(w.zh||'')}</div></div>`).join('') : '<div class="empty">无</div>';
+  kl.querySelectorAll('[data-en]').forEach(el=>{
+    const w = state.gameKnown.find(x=>x.en===el.dataset.en);
+    el.onclick = ()=>{ sfxClick(); openWordDetail(w, null); };
+  });
+  ul.querySelectorAll('[data-en]').forEach(el=>{
+    const w = state.gameUnknown.find(x=>x.en===el.dataset.en);
+    el.onclick = ()=>{ sfxClick(); openWordDetail(w, null); };
+  });
+  document.getElementById('resKnown').textContent = state.gameKnown.length;
+  document.getElementById('resUnknown').textContent = state.gameUnknown.length;
+  state.lastResult = { known: state.gameKnown.slice(), unknown: state.gameUnknown.slice() };
+  save(); sfxWin(); switchPage('gameresult');
+}
+
+/* ===== 卡片背词 ===== */
+let slideState = null;
+function startSlideGame(){
+  const q = buildGameQueue();
+  if(!q.length){ toast('没有可用的单词'); return; }
+  slideState = { queue:q, idx:0 };
+  state.gameKnown = []; state.gameUnknown = [];
+  document.getElementById('gameTitle').textContent = '📖 卡片背词';
+  document.getElementById('gameScore').textContent = '0 熟 / 0 不熟';
+  switchPage('gameplay');
+  renderSlideCard();
+}
+function renderSlideCard(){
+  const main = document.getElementById('gameMain');
+  const total = slideState.queue.length;
+  if(slideState.idx >= total){
+    endGame(state.gameKnown.length, state.gameUnknown.length, '不熟数');
+    return;
+  }
+  const w = slideState.queue[slideState.idx];
+  document.getElementById('gameScore').textContent = state.gameKnown.length + ' 熟 / ' + state.gameUnknown.length + ' 不熟';
+  main.innerHTML = `
+    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;padding:20px;">
+      <div class="progress-tag" style="position:absolute;top:10px;left:10px;">${slideState.idx+1} / ${total}</div>
+      <div id="slideCard" style="width:min(360px,88%);background:linear-gradient(145deg,#fff,#f2f8ff);border-radius:28px;padding:40px 24px;box-shadow:0 20px 40px -12px rgba(0,20,40,.25);text-align:center;cursor:grab;touch-action:pan-y;transition:transform .2s;">
+        <div style="font-size:clamp(28px,7vw,40px);font-weight:800;color:#1e3a5f;word-break:keep-all;line-height:1.2;">${esc(w.en)}</div>
+        <div style="font-size:18px;color:#2d4b6e;margin-top:20px;font-weight:700;filter:blur(12px);opacity:.4;transition:filter .3s;" id="slideZh">${esc(w.zh||'')}</div>
+      </div>
+      <div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:14px;color:#7a8fa8;font-weight:600;">
+        <span style="color:#c04545;">← 不认识</span> · <span style="color:#1b6b4c;">认识 →</span>
+      </div>
+    </div>
+  `;
+  const card = document.getElementById('slideCard');
+  const zh = document.getElementById('slideZh');
+  card.addEventListener('click', ()=>{ sfxClick(); zh.style.filter='none'; zh.style.opacity='1'; });
+  speakWord(w.en);
+  let startX = 0, curX = 0, dragging = false;
+  const onDown = (x)=>{ dragging=true; startX=x; card.style.transition='none'; };
+  const onMove = (x)=>{ if(!dragging) return; curX = x - startX; card.style.transform = `translateX(${curX}px) rotate(${curX/20}deg)`; };
+  const onUp = ()=>{
+    if(!dragging) return;
+    dragging=false; card.style.transition='transform .25s';
+    if(curX > 80){ card.style.transform = 'translateX(120%) rotate(20deg)'; setTimeout(()=>{ registerSlide(true, w); }, 180); }
+    else if(curX < -80){ card.style.transform = 'translateX(-120%) rotate(-20deg)'; setTimeout(()=>{ registerSlide(false, w); }, 180); }
+    else card.style.transform = '';
+    curX = 0;
+  };
+  card.addEventListener('mousedown', e=>onDown(e.clientX));
+  card.addEventListener('mousemove', e=>onMove(e.clientX));
+  card.addEventListener('mouseup', onUp);
+  card.addEventListener('mouseleave', onUp);
+  card.addEventListener('touchstart', e=>onDown(e.touches[0].clientX), {passive:true});
+  card.addEventListener('touchmove', e=>onMove(e.touches[0].clientX), {passive:true});
+  card.addEventListener('touchend', onUp);
+}
+function registerSlide(known, w){
+  if(known){ state.mastery[w.en.toLowerCase()] = true; state.gameKnown.push(w); sfxCorrect(); }
+  else { addWrongAuto(w); state.gameUnknown.push(w); sfxWrong(); }
+  save(); slideState.idx++; renderSlideCard();
+}
+
+/* ===== 词义挑战 ===== */
+let quizState = null;
+let quizMode = 'en2zh';
+function startQuizGame(){
+  const q = buildGameQueue();
+  if(!q.length){ toast('没有可用的单词'); return; }
+  quizState = { queue:q, idx:0, correct:0, wrong:0 };
+  state.gameKnown = []; state.gameUnknown = [];
+  document.getElementById('gameTitle').textContent = '📝 词义挑战';
+  document.getElementById('gameScore').textContent = '0 分';
+  switchPage('gameplay');
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  const main = document.getElementById('gameMain');
+  const total = quizState.queue.length;
+  if(quizState.idx >= total){
+    endGame(quizState.correct*10, quizState.wrong, '错误数');
+    return;
+  }
+  const w = quizState.queue[quizState.idx];
+  let mode = quizMode;
+  if(mode==='mix') mode = Math.random()<0.5 ? 'en2zh' : 'zh2en';
+  const pool = quizState.queue.filter(x=>x!==w);
+  const distract = [];
+  while(distract.length<3 && pool.length){
+    const i = Math.floor(Math.random()*pool.length);
+    if(!distract.includes(pool[i])) distract.push(pool[i]);
+    pool.splice(i,1);
+  }
+  const options = [w, ...distract].sort(()=>Math.random()-.5);
+  const question = mode==='en2zh' ? w.en : (w.zh||'—');
+  const qLabel = mode==='en2zh' ? '看英文 · 选中文' : '看中文 · 选英文';
+  main.innerHTML = `
+    <div style="width:100%;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <div class="progress-tag" style="position:static;">${quizState.idx+1} / ${total}</div>
+        <div class="seg" id="quizModeSeg" style="width:auto;">
+          <button data-qm="en2zh" class="${quizMode==='en2zh'?'active':''}">英→中</button>
+          <button data-qm="zh2en" class="${quizMode==='zh2en'?'active':''}">中→英</button>
+          <button data-qm="mix" class="${quizMode==='mix'?'active':''}">混合</button>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#fff,#f2f8ff);border-radius:22px;padding:24px 20px;text-align:center;">
+        <div style="font-size:13px;color:#7a8fa8;font-weight:600;margin-bottom:8px;">${qLabel}</div>
+        <div style="font-size:clamp(28px,7vw,44px);font-weight:800;color:#1e3a5f;word-break:keep-all;line-height:1.2;">${esc(question)}</div>
+        ${mode==='en2zh'?`<div style="font-size:15px;color:#7a8fa8;margin-top:8px;">${esc(w.phon||'')}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${options.map((o,i)=>{
+          const txt = mode==='en2zh' ? (o.zh||'—') : o.en;
+          return `<button class="quiz-option" data-qi="${i}">${esc(txt)}</button>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  if(mode==='en2zh') speakWord(w.en);
+  main.querySelectorAll('[data-qi]').forEach(b=>{
+    b.onclick = ()=>{
+      const o = options[+b.dataset.qi];
+      const ok = o.en === w.en;
+      if(ok){
+        b.classList.add('correct');
+        quizState.correct++;
+        state.mastery[w.en.toLowerCase()] = true;
+        state.gameKnown.push(w);
+        sfxCorrect();
+      }else{
+        b.classList.add('wrong');
+        quizState.wrong++;
+        addWrongAuto(w);
+        state.gameUnknown.push(w);
+        sfxWrong();
+        main.querySelectorAll('[data-qi]').forEach(bb=>{
+          const oo = options[+bb.dataset.qi];
+          if(oo.en === w.en) bb.classList.add('correct');
+          bb.disabled = true;
+        });
+      }
+      document.getElementById('gameScore').textContent = (quizState.correct*10)+' 分';
+      setTimeout(()=>{ quizState.idx++; renderQuizQuestion(); }, 700);
+    };
+  });
+  main.querySelectorAll('#quizModeSeg button').forEach(b=>{
+    b.onclick = (e)=>{ e.stopPropagation(); sfxClick(); quizMode = b.dataset.qm;
+      main.querySelectorAll('#quizModeSeg button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderQuizQuestion();
+    };
+  });
+}
+
+/* ===== 单词堡垒 ===== */
+let towerState = null;
+function startTowerGame(){
+  const q = buildGameQueue();
+  if(!q.length){ toast('没有可用的单词'); return; }
+  towerState = { queue:q, idx:0, wave:1, score:0, lives:3, enemyTop:0,
+    currentWord:null, options:[], running:true, timer:null, difficulty:'normal', wrongCount:0, attempt:0 };
+  state.gameKnown = []; state.gameUnknown = [];
+  document.getElementById('gameTitle').textContent = '🛡️ 单词堡垒';
+  document.getElementById('gameScore').textContent = '0 分';
+  switchPage('gameplay');
+  nextTowerEnemy(); renderTowerScene();
+  towerState.timer = setInterval(towerTick, 200);
+}
+function nextTowerEnemy(){
+  const w = towerState.queue[towerState.idx % towerState.queue.length];
+  towerState.currentWord = w;
+  towerState.enemyTop = 0;
+  towerState.attempt = 0;
+  const pool = towerState.queue.filter(x=>x!==w);
+  const distract = [];
+  while(distract.length<2 && pool.length){
+    const i = Math.floor(Math.random()*pool.length);
+    if(!distract.includes(pool[i])) distract.push(pool[i]);
+    pool.splice(i,1);
+  }
+  towerState.options = [w, ...distract].sort(()=>Math.random()-.5);
+}
+function towerTick(){
+  if(!towerState || !towerState.running) return;
+  const speeds = { easy: 7000, normal: 5500, hard: 4000 };
+  const total = speeds[towerState.difficulty] || 5500;
+  const step = (100 * 200) / total;
+  towerState.enemyTop += step;
+  const en = document.getElementById('towerEnemy');
+  if(en) en.style.top = towerState.enemyTop + '%';
+  if(towerState.enemyTop >= 100){
+    towerState.lives--;
+    towerState.score = Math.max(0, towerState.score - 5);
+    addWrongAuto(towerState.currentWord);
+    towerState.wrongCount++;
+    state.gameUnknown.push(towerState.currentWord);
+    sfxLose(); updateTowerHud();
+    if(towerState.lives <= 0){ finishTower(); return; }
+    towerState.idx++; nextTowerEnemy(); refreshTowerUI();
+  }
+}
+function renderTowerScene(){
+  const main = document.getElementById('gameMain');
+  const r = towerState;
+  main.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;height:100%;">
+      <div class="tower-hud"><span>❤️ ${r.lives}</span><span>🌊 第 ${r.wave} 波</span><span>🏆 ${r.score}</span></div>
+      <div id="towerField" style="flex:1;position:relative;background:linear-gradient(180deg,#1a2535,#2d4b6e);border-radius:20px;overflow:hidden;min-height:200px;">
+        <div id="towerEnemy" class="tower-enemy" style="top:0%;">${esc(r.currentWord.zh||'')}</div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:#5cd6a3;"></div>
+      </div>
+      <div id="towerTurrets" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;background:rgba(45,75,110,.95);border-radius:18px;">
+        ${r.options.map((o,i)=>`<div class="tower-turret" data-ti="${i}" style="background:#fff;border-radius:14px;padding:14px 6px;text-align:center;cursor:pointer;font-weight:700;font-size:14px;color:#1e3a5f;">${esc(o.en)}</div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:center;">
+        <span style="font-size:13px;color:#7a8fa8;font-weight:600;">难度：</span>
+        <div class="seg" id="towerDiffSeg" style="width:auto;">
+          <button data-td="easy" class="${r.difficulty==='easy'?'active':''}">简单</button>
+          <button data-td="normal" class="${r.difficulty==='normal'?'active':''}">普通</button>
+          <button data-td="hard" class="${r.difficulty==='hard'?'active':''}">困难</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.querySelectorAll('#towerDiffSeg button').forEach(b=>{
+    b.onclick = (e)=>{ e.stopPropagation(); sfxClick(); towerState.difficulty = b.dataset.td; document.querySelectorAll('#towerDiffSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); };
+  });
+  bindTowerOptions();
+}
+function bindTowerOptions(){
+  document.querySelectorAll('.tower-turret').forEach(el=>{
+    el.onclick = ()=>{
+      const o = towerState.options[+el.dataset.ti];
+      const correct = o.en === towerState.currentWord.en;
+      if(correct){
+        el.style.background = '#e3f4ea'; el.style.border = '2px solid #3ea672';
+        towerState.score += 15;
+        state.mastery[towerState.currentWord.en.toLowerCase()] = true;
+        state.gameKnown.push(towerState.currentWord);
+        sfxCorrect();
+        const field = document.getElementById('towerField');
+        const boom = document.createElement('div');
+        boom.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:90px;font-weight:900;z-index:10;animation:boom .6s ease-out;';
+        boom.textContent = '💥';
+        const txt = document.createElement('div');
+        txt.style.cssText = 'position:absolute;top:30%;left:50%;transform:translateX(-50%);font-size:32px;font-weight:900;color:#f7b731;text-shadow:0 2px 8px rgba(0,0,0,.5);z-index:11;';
+        txt.textContent = '消灭！+15';
+        field.appendChild(boom); field.appendChild(txt);
+        setTimeout(()=>{ boom.remove(); txt.remove(); }, 600);
+        setTimeout(()=>{
+          towerState.idx++;
+          if(towerState.idx % 5 === 0) towerState.wave++;
+          nextTowerEnemy(); refreshTowerUI();
+        }, 400);
+      }else{
+        towerState.attempt++;
+        towerState.score = Math.max(0, towerState.score - 5);
+        sfxWrong();
+        el.style.background = '#fff2f2'; el.style.border = '2px solid #d9534f';
+        const field = document.getElementById('towerField');
+        const boom = document.createElement('div');
+        boom.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;font-weight:900;z-index:10;animation:boom .6s ease-out;';
+        boom.textContent = '❌';
+        const txt = document.createElement('div');
+        txt.style.cssText = 'position:absolute;top:30%;left:50%;transform:translateX(-50%);font-size:28px;font-weight:900;color:#c04545;text-shadow:0 2px 8px rgba(0,0,0,.5);z-index:11;';
+        txt.textContent = '错误！-5';
+        field.appendChild(boom); field.appendChild(txt);
+        setTimeout(()=>{ boom.remove(); txt.remove(); }, 700);
+        towerState.enemyTop = Math.min(95, towerState.enemyTop + 15);
+        const en = document.getElementById('towerEnemy');
+        if(en) en.style.top = towerState.enemyTop + '%';
+        if(towerState.attempt >= 2){
+          towerState.lives--;
+          addWrongAuto(towerState.currentWord);
+          towerState.wrongCount++;
+          state.gameUnknown.push(towerState.currentWord);
+          updateTowerHud();
+          if(towerState.lives <= 0){ finishTower(); return; }
+          towerState.idx++; nextTowerEnemy(); refreshTowerUI();
+          return;
+        }
+        setTimeout(()=>{ el.style.background = '#fff'; el.style.border = '2px solid transparent'; }, 500);
+      }
+      updateTowerHud();
+    };
+  });
+}
+function refreshTowerUI(){
+  if(!towerState) return;
+  const en = document.getElementById('towerEnemy');
+  updateTowerHud();
+  if(en){ en.textContent = towerState.currentWord.zh||''; en.style.top = '0%'; }
+  const tt = document.getElementById('towerTurrets');
+  if(tt){
+    tt.innerHTML = towerState.options.map((o,i)=>`<div class="tower-turret" data-ti="${i}" style="background:#fff;border-radius:14px;padding:14px 6px;text-align:center;cursor:pointer;font-weight:700;font-size:14px;color:#1e3a5f;">${esc(o.en)}</div>`).join('');
+    bindTowerOptions();
+  }
+  document.getElementById('gameScore').textContent = towerState.score+' 分';
+}
+function updateTowerHud(){
+  const hud = document.querySelector('.tower-hud');
+  if(hud && towerState) hud.innerHTML = `<span>❤️ ${towerState.lives}</span><span>🌊 第 ${towerState.wave} 波</span><span>🏆 ${towerState.score}</span>`;
+}
+function finishTower(){
+  if(!towerState) return;
+  towerState.running = false;
+  if(towerState.timer) clearInterval(towerState.timer);
+  endGame(towerState.score, towerState.wave, '波次');
+}
+
+/* ===== 存档（导出/导入文件） ===== */
+function genArchiveCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for(let i=0;i<8;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function uploadArchive(){
+  const code = genArchiveCode();
+  const data = JSON.stringify(getArchiveData());
+  const blob = new Blob([data], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '听听就会_存档_'+code+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showModal('💾 已导出存档文件', `
+    <div style="font-size:15px;">文件名：听听就会_存档_${code}.json</div>
+    <div style="font-size:13px;color:#7a8fa8;margin-top:8px;">请把文件保存到网盘/微信收藏，换设备时用"导入数据"恢复。</div>
+  `, [{text:'知道了', cls:'primary', fn: closeModal}]);
+}
+function restoreArchive(){
+  showModal('📥 恢复存档', `
+    <div style="font-size:14px;color:#5a6f88;">选择之前导出的 .json 存档文件：</div>
+  `, [
+    {text:'取消', cls:'ghost', fn: closeModal},
+    {text:'选择文件', cls:'primary', fn: ()=>{
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = '.json';
+      inp.onchange = (e)=>{
+        const f = e.target.files[0]; if(!f) return;
+        const rd = new FileReader();
+        rd.onload = ()=>{
+          try{ applyArchive(JSON.parse(rd.result)); closeModal(); toast('恢复成功'); }
+          catch(err){ toast('文件格式错误'); }
+        };
+        rd.readAsText(f);
+      };
+      inp.click();
+    }}
+  ]);
+}
+function getArchiveData(){
+  return { books: state.books, wrongBook: state.wrongBook, mastery: state.mastery,
+    folders: state.folders, checkin: state.checkin, checkedGroups: state.checkedGroups,
+    recycle: state.recycle, bestScores: state.bestScores };
+}
+function applyArchive(d){
+  if(!d) return;
+  if(d.books) state.books = d.books;
+  if(d.wrongBook) state.wrongBook = d.wrongBook;
+  if(d.mastery) state.mastery = d.mastery;
+  if(d.folders) state.folders = d.folders;
+  if(d.checkin) state.checkin = d.checkin;
+  if(d.checkedGroups) state.checkedGroups = d.checkedGroups;
+  if(d.recycle) state.recycle = d.recycle;
+  if(d.bestScores) state.bestScores = d.bestScores;
+  save(); renderAll();
+}
+
+/* ===== 页面切换 ===== */
+function switchPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if(pg) pg.classList.add('active');
+  const tb = document.querySelector('.tab[data-page="'+name+'"]');
+  if(tb) tb.classList.add('active');
+  if(name!=='dictation') stopAutoPlay();
+  if(name!=='gameplay'){
+    if(towerState && towerState.running && name!=='gameresult'){ towerState.running=false; if(towerState.timer) clearInterval(towerState.timer); }
+  }
+  stopDetailLoop();
+  if(name==='books') renderBooks();
+  if(name==='wrongbook') renderWrongBook();
+  if(name==='review') renderReview();
+  if(name==='dictation') renderDictation();
+}
+function renderAll(){ renderDictation(); renderBooks(); renderWrongBook(); renderReview(); }
+
+/* ===== 复习 ===== */
+let reviewSelected = new Set();
+function renderReview(){
+  const wrap = document.getElementById('reviewGroups');
+  const list = Object.keys(state.checkedGroups);
+  document.getElementById('reviewCount').textContent = list.length+' 组';
+  if(!list.length){
+    wrap.innerHTML = '<div class="empty">还没有打卡过的组</div>';
+    document.getElementById('reviewWordList').innerHTML = '<div class="empty">暂无</div>';
+    return;
+  }
+  const items = [];
+  list.forEach(k=>{
+    const bk = state.books.find(b=>k.startsWith(b.name+' › '));
+    if(!bk) return;
+    const gname = k.substring(bk.name.length+3);
+    const g = bk.groups.find(x=>x.name===gname);
+    if(g) items.push({key:k, group:g, book:bk});
+  });
+  wrap.innerHTML = items.map(it=>{
+    const sel = reviewSelected.has(it.key) ? 'selected' : '';
+    return `<div class="group-row ${sel}" data-rk="${escAttr(it.key)}"><div class="gcheck">${sel?'✓':''}</div><div class="gname">${esc(it.group.name)}</div><div class="gnum">${it.group.words.length} 词</div></div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-rk]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      sfxClick();
+      const k = el.dataset.rk;
+      if(reviewSelected.has(k)) reviewSelected.delete(k); else reviewSelected.add(k);
+      renderReview();
+    });
+  });
+  const words = [];
+  reviewSelected.forEach(k=>{
+    items.forEach(it=>{ if(it.key===k) words.push(...it.group.words); });
+  });
+  document.getElementById('reviewWordCount').textContent = words.length;
+  const wl = document.getElementById('reviewWordList');
+  if(!words.length){ wl.innerHTML = '<div class="empty">选择分组后显示单词</div>'; return; }
+  wl.innerHTML = words.map(w=>`<div class="wrow"><div class="wen">${esc(w.en)}</div>${w.freq?`<div class="wfreq">🔥${w.freq}</div>`:''}<div class="wzh">${esc(w.zh||'')}</div></div>`).join('');
+}
+
+/* ===== 大板块左右滑动 ===== */
+const PAGE_ORDER = ['dictation','books','game','review','wrongbook','search','more'];
+let pageSwipeStartX = 0, pageSwipeStartY = 0, pageSwipeMove = false;
+function bindPageSwipe(){
+  const el = document.getElementById('contentArea');
+  if(!el || el._pageSwipeBound) return;
+  el._pageSwipeBound = true;
+  el.addEventListener('touchstart', (e)=>{
+    const t = e.touches[0];
+    pageSwipeStartX = t.clientX;
+    pageSwipeStartY = t.clientY;
+    pageSwipeMove = false;
+  }, {passive:true});
+  el.addEventListener('touchmove', (e)=>{
+    if(pageSwipeMove) return;
+    const t = e.touches[0];
+    const dx = t.clientX - pageSwipeStartX;
+    const dy = t.clientY - pageSwipeStartY;
+    if(Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      pageSwipeMove = true;
+      let cur = null;
+      document.querySelectorAll('.page').forEach(p=>{ if(p.classList.contains('active')) cur = p.id.replace('page-',''); });
+      let idx = PAGE_ORDER.indexOf(cur);
+      if(idx < 0) return;
+      if(dx < 0 && idx < PAGE_ORDER.length-1){ sfxClick(); switchPage(PAGE_ORDER[idx+1]); }
+      else if(dx > 0 && idx > 0){ sfxClick(); switchPage(PAGE_ORDER[idx-1]); }
+    }
+  }, {passive:true});
+  el.addEventListener('touchend', ()=>{ pageSwipeMove = false; });
+}
+
+function parseBookText(text){
+  const lines = text.split(/\r?\n/);
+  const groups = []; let cur = null;
+  lines.forEach(line=>{
+    line = line.trim(); if(!line) return;
+    if(line.startsWith('#')){
+      cur = { id:'g_'+uid(), name: line.slice(1).trim()||('组'+(groups.length+1)), words:[] };
+      groups.push(cur); return;
+    }
+    let en='', zh='';
+    const m = line.match(/^([^,\s=]+)\s*[,=\s]\s*(.+)$/);
+    if(m){ en=m[1].trim(); zh=m[2].trim(); }
+    else { en=line; zh='—'; }
+    if(!en) return;
+    if(!cur){ cur = { id:'g_'+uid(), name:'第1组', words:[] }; groups.push(cur); }
+    cur.words.push({ en, zh: zh||'—' });
+  });
+  if(!groups.length) return null;
+  return { id:'book_'+uid(), name:'自定义词书', groups };
+}
+function copyText(txt){
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(()=>toast('已复制')).catch(()=>fallbackCopy(txt)); }
+  else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand('copy'); toast('已复制'); }catch(e){ toast('复制失败'); }
+  document.body.removeChild(ta);
+}
+
+/* ===== 事件绑定 ===== */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{ sfxClick(); switchPage(t.dataset.page); });
+});
+document.getElementById('moreBtnTop').onclick = ()=>{ sfxClick(); switchPage('more'); };
+document.querySelectorAll('#viewSeg button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#viewSeg button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); state.viewMode = b.dataset.view; renderDictation();
+  });
+});
+document.getElementById('orderToggleBtn').onclick = toggleOrder;
+document.getElementById('reviewWordsBtn').onclick = ()=>{ sfxClick(); showReviewTable(); };
+document.getElementById('playBtn').onclick = ()=>{ sfxClick(); playToggle(); };
+document.getElementById('prevBtn').onclick = ()=>{ sfxClick(); prevWord(); };
+document.getElementById('nextBtn').onclick = ()=>{ sfxClick(); nextWord(); };
+document.getElementById('pronBtn').onclick = ()=>{ sfxClick(); speakCurrent(); };
+document.getElementById('wordEn').onclick = ()=>{ sfxClick(); speakCurrent(); };
+document.getElementById('wrongBtn').onclick = markWrong;
+document.getElementById('starBtn').onclick = markStar;
+document.getElementById('dictSettingsBtn').onclick = ()=>{
+  sfxClick();
+  showModal('⚙️ 听写设置', `
+    <div class="card-title" style="margin:0;">听力模式</div>
+    <div class="seg" id="listenModeSeg">
+      <button data-lm="on" class="${state.listenMode==='on'?'active':''}">🔊 不静音</button>
+      <button data-lm="off" class="${state.listenMode==='off'?'active':''}">🔇 静音</button>
+    </div>
+    <div class="card-title" style="margin:10px 0 0 0;">每词重复次数</div>
+    <input type="number" id="setRepeat" min="1" max="10" value="${state.listenRepeat}">
+    <div class="card-title" style="margin:10px 0 0 0;">间隔秒数（读完后等多久切下一个）</div>
+    <input type="number" id="setIntervalSec" min="1" max="60" value="${state.listenIntervalSec}">
+  `, [
+    {text:'取消', cls:'ghost', fn: closeModal},
+    {text:'保存', cls:'primary', fn: ()=>{
+      state.listenRepeat = Math.max(1, +document.getElementById('setRepeat').value||1);
+      state.listenIntervalSec = Math.max(1, +document.getElementById('setIntervalSec').value||3);
+      save(); closeModal(); toast('已保存');
+    }}
+  ], (body)=>{
+    body.querySelectorAll('#listenModeSeg button').forEach(b=>{
+      b.onclick = ()=>{
+        body.querySelectorAll('#listenModeSeg button').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active'); state.listenMode = b.dataset.lm; save();
+      };
+    });
+  });
+};
+document.getElementById('newBookBtn').onclick = ()=>{
+  sfxClick();
+  showModal('导入词书', `
+    <textarea id="importBookText" placeholder="每行一个单词：英文 中文&#10;可以用 #分组名 开始新组"></textarea>
+    <input type="file" id="importFileInput" accept=".txt,.csv" style="margin-top:8px;">
+    <div style="font-size:12px;color:#a5b6c9;margin-top:4px;">或选择 .txt / .csv 文件导入</div>
+  `, [
+    {text:'取消', cls:'ghost', fn: closeModal},
+    {text:'确定导入', cls:'primary', fn: ()=>{
+      const v = document.getElementById('importBookText').value.trim();
+      if(!v){ toast('请输入内容'); return; }
+      const bk = parseBookText(v);
+      if(!bk){ toast('解析失败'); return; }
+      state.books.push(bk); state.currentBookId = bk.id; state.currentGroupId = bk.groups[0]?.id;
+      save(); closeModal(); renderBooks(); toast('已导入：'+bk.name);
+    }}
+  ], (body)=>{
+    body.querySelector('#importFileInput').onchange = (e)=>{
+      const file = e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        const bk = parseBookText(reader.result);
+        if(!bk){ toast('解析失败'); return; }
+        bk.name = file.name.replace(/\.[^.]+$/,'') || '导入词书';
+        state.books.push(bk); state.currentBookId = bk.id; state.currentGroupId = bk.groups[0]?.id;
+        save(); closeModal(); renderBooks(); toast('已导入：'+bk.name);
+      };
+      reader.readAsText(file);
+    };
+  });
+};
+document.getElementById('recycleBtn').onclick = ()=>{ sfxClick(); openRecycle(); };
+document.querySelectorAll('.game-card').forEach(c=>{
+  c.addEventListener('click', ()=>{
+    sfxClick();
+    const m = c.dataset.mode;
+    state.currentGameMode = m;
+    if(m==='slide') startSlideGame();
+    else if(m==='quiz') startQuizGame();
+    else if(m==='tower') startTowerGame();
+  });
+});
+document.getElementById('gameSelectBtn').onclick = ()=>{ sfxClick(); openGameSelect(); };
+document.getElementById('clearResultBtn').onclick = ()=>{
+  state.gameKnown=[]; state.gameUnknown=[]; state.lastResult={known:[],unknown:[]}; save();
+  document.getElementById('resKnown').textContent = 0;
+  document.getElementById('resUnknown').textContent = 0;
+  toast('已清空');
+};
+document.querySelectorAll('[data-res]').forEach(el=>{
+  el.onclick = ()=>{ sfxClick(); switchPage('gameresult'); };
+});
+document.getElementById('soundToggleBtn').onclick = ()=>{
+  state.soundOn = !state.soundOn; save();
+  document.getElementById('soundToggleBtn').textContent = state.soundOn ? '🔔 音效开' : '🔕 音效关';
+  if(state.soundOn) sfxClick();
+};
+document.getElementById('gameExitBtn').onclick = ()=>{
+  sfxClick();
+  if(slideState) slideState = null;
+  if(towerState){ towerState.running=false; if(towerState.timer) clearInterval(towerState.timer); }
+  switchPage('game');
+};
+document.getElementById('resultBackBtn').onclick = ()=>{ sfxClick(); switchPage('game'); };
+document.getElementById('playAgainBtn').onclick = ()=>{
+  sfxClick();
+  const m = state.currentGameMode;
+  if(m==='slide') startSlideGame();
+  else if(m==='quiz') startQuizGame();
+  else if(m==='tower') startTowerGame();
+};
+document.getElementById('exitGameBtn').onclick = ()=>{ sfxClick(); switchPage('game'); };
+document.getElementById('reviewAllBtn').onclick = ()=>{ Object.keys(state.checkedGroups).forEach(k=>reviewSelected.add(k)); renderReview(); };
+document.getElementById('reviewNoneBtn').onclick = ()=>{ reviewSelected.clear(); renderReview(); };
+document.getElementById('reviewStartBtn').onclick = ()=>{
+  if(!reviewSelected.size){ toast('请先选择分组'); return; }
+  const words = [];
+  reviewSelected.forEach(k=>{
+    state.books.forEach(b=>b.groups.forEach(g=>{
+      if(b.name+' › '+g.name===k) words.push(...g.words);
+    }));
+  });
+  if(!words.length){ toast('无单词'); return; }
+  let tmp = state.books.find(b=>b.id==='__review__');
+  if(!tmp){ tmp = { id:'__review__', name:'复习', groups:[] }; state.books.push(tmp); }
+  tmp.groups = [{ id:'__review_g__', name:'复习组', words }];
+  state.currentBookId = tmp.id; state.currentGroupId = tmp.groups[0].id;
+  state.currentIndex = 0; state.shuffledOrder = null; state.isShuffled = false;
+  save(); switchPage('dictation'); renderDictation(); toast('已进入复习听写');
+};
+document.querySelectorAll('#wrongSeg button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('#wrongSeg button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); wrongType = b.dataset.wt; renderWrongBook();
+  };
+});
+document.getElementById('newFolderBtn').onclick = ()=>{
+  sfxClick();
+  openPrompt('新建错题夹', '例如：我的高频错词', (v)=>{
+    if(!v) return;
+    if(state.folders.includes(v)){ toast('已存在'); return; }
+    state.folders.push(v); save(); renderWrongBook();
+  });
+};
+document.getElementById('askToggleBtn').onclick = ()=>{
+  state.askOnMark = !state.askOnMark; save();
+  document.getElementById('askToggleBtn').textContent = '⚙️ 标记时询问：' + (state.askOnMark?'开':'关');
+  toast('已'+(state.askOnMark?'开启':'关闭'));
+};
+document.getElementById('searchBtn').onclick = ()=>{ sfxClick(); doSearch(); };
+document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); doSearch(); } });
+document.getElementById('moreCheckinBtn').onclick = ()=>{
+  sfxClick();
+  showModal('📅 打卡 & 学习报告', `
+    <div class="checkin-grid" id="checkinGrid"></div>
+    <div class="stat-row" style="margin-top:10px;">
+      <div class="stat"><div class="snum" id="statTotal">0</div><div class="slbl">累计天数</div></div>
+      <div class="stat"><div class="snum" id="statStreak">0</div><div class="slbl">连续天数</div></div>
+      <div class="stat"><div class="snum" id="statGroups">0</div><div class="slbl">今日词数</div></div>
+    </div>
+    <div style="margin-top:10px;font-size:14px;color:#5a6f88;">今日目标：<input type="number" id="todayGoal" min="1" value="${state.todayGoal}" style="width:80px;min-height:40px;padding:6px 10px;font-size:15px;display:inline-block;"> 词</div>
+    <div style="font-size:13px;color:#7a8fa8;margin-top:6px;" id="todayInfo"></div>
+    <div class="card-title" style="margin-top:14px;">📊 学习报告</div>
+    <div id="reportBox"></div>
+  `, [{text:'关闭', cls:'primary', fn: closeModal}], ()=>{
+    renderCheckin();
+    const today = todayStr();
+    document.getElementById('statTotal').textContent = Object.keys(state.checkin).length;
+    document.getElementById('statStreak').textContent = calcStreak();
+    let tw = 0;
+    if(state.checkin[today]) tw = state.checkin[today].words||0;
+    document.getElementById('statGroups').textContent = tw;
+    const extra = tw > state.todayGoal ? '（超额 '+(tw-state.todayGoal)+'）' : '';
+    document.getElementById('todayInfo').textContent = '今日已学 '+tw+' 词 / 目标 '+state.todayGoal+' 词 '+extra;
+    document.getElementById('todayGoal').onchange = (e)=>{
+      state.todayGoal = Math.max(1, +e.target.value||20); save();
+      const ex = tw > state.todayGoal ? '（超额 '+(tw-state.todayGoal)+'）' : '';
+      document.getElementById('todayInfo').textContent = '今日已学 '+tw+' 词 / 目标 '+state.todayGoal+' 词 '+ex;
+    };
+    const bk = getBook();
+    let total=0, star=0, wrong=0;
+    bk.groups.forEach(g=>g.words.forEach(w=>{ total++; if(state.mastery[w.en.toLowerCase()]) star++; }));
+    Object.values(state.wrongBook).forEach(arr=>wrong += arr.length);
+    document.getElementById('reportBox').innerHTML = `
+      <div class="stat-row"><div class="stat"><div class="snum">${total}</div><div class="slbl">总词数</div></div><div class="stat"><div class="snum">${star}</div><div class="slbl">熟练</div></div><div class="stat"><div class="snum">${wrong}</div><div class="slbl">错题</div></div></div>
+    `;
+  });
+};
+document.getElementById('moreArchiveBtn').onclick = ()=>{
+  sfxClick();
+  showModal('☁️ 存档管理', `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn primary" id="arcBackup" style="justify-content:flex-start;">💾 备份存档（下载文件）</button>
+      <button class="btn ghost" id="arcRestore" style="justify-content:flex-start;">📥 恢复存档（选择文件）</button>
+      <button class="btn ghost" id="arcExport" style="justify-content:flex-start;">📤 导出全部数据（复制 JSON）</button>
+      <button class="btn ghost" id="arcImport" style="justify-content:flex-start;">📥 导入数据（粘贴 JSON）</button>
+    </div>
+    <div style="font-size:12px;color:#7a8fa8;margin-top:6px;">备份会下载一个 .json 文件，请保存好，换设备时用它恢复</div>
+  `, [{text:'关闭', cls:'primary', fn: closeModal}], (body)=>{
+    body.querySelector('#arcBackup').onclick = ()=>{ closeModal(); uploadArchive(); };
+    body.querySelector('#arcRestore').onclick = ()=>{ closeModal(); restoreArchive(); };
+    body.querySelector('#arcExport').onclick = ()=>{ copyText(JSON.stringify(getArchiveData())); };
+    body.querySelector('#arcImport').onclick = ()=>{
+      openPrompt('粘贴之前导出的 JSON 数据','',(v)=>{
+        if(!v) return;
+        try{ applyArchive(JSON.parse(v)); closeModal(); toast('已导入'); }
+        catch(e){ toast('数据格式错误'); }
+      });
+    };
+  });
+};
+document.getElementById('moreExportWrongBtn').onclick = ()=>{
+  sfxClick();
+  const txt = Object.entries(state.wrongBook).map(([g,arr])=>'【'+g+'】\n'+arr.map(w=>w.en+' '+w.zh).join('\n')).join('\n\n');
+  copyText(txt || '（空）');
+};
+document.getElementById('moreThemeBtn').onclick = ()=>{
+  sfxClick();
+  state.dark = !state.dark;
+  document.body.classList.toggle('dark', state.dark); save();
+};
+document.getElementById('moreAchieveBtn').onclick = ()=>{
+  sfxClick();
+  const days = Object.keys(state.checkin).length;
+  const list = [
+    { name:'初次打卡', done: days>=1 },
+    { name:'坚持一周', done: calcStreak()>=7 },
+    { name:'半月不懈', done: calcStreak()>=15 },
+    { name:'月度达人', done: calcStreak()>=30 },
+    { name:'熟练 50', done: Object.keys(state.mastery).length>=50 },
+    { name:'熟练 200', done: Object.keys(state.mastery).length>=200 },
+    { name:'错题清零', done: Object.values(state.wrongBook).flat().length===0 }
+  ];
+  showModal('🏆 成就系统', list.map(a=>`<div class="group-row" style="${a.done?'':'opacity:.5'}"><div class="gname">${a.done?'🏆':'🔒'} ${a.name}</div></div>`).join(''), [{text:'关闭', cls:'primary', fn: closeModal}]);
+};
+document.getElementById('moreResetBtn').onclick = ()=>{
+  if(!confirm('重置所有数据？不可恢复')) return;
+  localStorage.removeItem(LS_KEY); location.reload();
+};
+document.getElementById('modalMask').addEventListener('click', e=>{ if(e.target.id==='modalMask') closeModal(); });
+
+/* ===== 启动 ===== */
+load();
+const stBtn = document.getElementById('soundToggleBtn');
+if(stBtn) stBtn.textContent = state.soundOn ? '🔔 音效开' : '🔕 音效关';
+const askBtn = document.getElementById('askToggleBtn');
+if(askBtn) askBtn.textContent = '⚙️ 标记时询问：' + (state.askOnMark?'开':'关');
+renderAll();
+bindPageSwipe();
+if(state.gameSelectedKeys){
+  const info = document.getElementById('gameSelectedInfo');
+  if(info) info.textContent = '已选 '+state.gameSelectedKeys.length+' 组';
+}
+</script>
+</body>
+</html>
