@@ -312,7 +312,7 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
 
     <div class="page" id="page-gameplay">
       <div class="card" style="flex:0 0 auto;padding:8px 12px;flex-direction:row;align-items:center;gap:8px;">
-        <button class="btn ghost sm" id="gameExitBtn">← 退出</button>
+<button class="btn ghost sm" id="gameExitBtn">← 退出</button>
         <div style="flex:1;text-align:center;font-weight:700;color:#1e3a5f;font-size:15px;" id="gameTitle">游戏</div>
         <div class="badge" id="gameScore">0 分</div>
       </div>
@@ -417,6 +417,7 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
           <button class="btn ghost" id="moreArchiveBtn" style="justify-content:flex-start;">☁️ 存档管理</button>
           <button class="btn ghost" id="moreExportWrongBtn" style="justify-content:flex-start;">📤 导出错题本</button>
           <button class="btn ghost" id="moreThemeBtn" style="justify-content:flex-start;">🌙 深色模式</button>
+          <button class="btn ghost" id="moreAchieveBtn" style="justify-content:flex-start;">🏆 成就系统</button>
           <button class="btn danger" id="moreResetBtn" style="justify-content:flex-start;">⚠️ 重置所有数据</button>
         </div>
         <div style="margin-top:20px;padding-top:14px;border-top:1px solid #eef3fa;text-align:center;">
@@ -2920,8 +2921,18 @@ document.getElementById('moreNoticeBtn').onclick = ()=>{
 };
 document.getElementById('searchBtn').onclick = ()=>{ sfxClick(); doSearch(); };
 document.getElementById('searchInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); doSearch(); } });
-document.getElementById('moreCheckinBtn').onclick = ()=>{
+document.getElementById('moreNoticeBtn').onclick = ()=>{
   sfxClick();
+  showModal('📢 更新公告', `
+    <div style="font-size:14px;color:#5a6f88;line-height:2;">
+      <div>• 修复词书"遮英文 / 遮中文"反向的问题</div>
+      <div>• 单词列表左半边点击可发音，右半边点击进详情</div>
+      <div>• 单词详情页圆角调整，不再遮挡单词</div>
+      <div>• 单词堡垒每组词自动乱序</div>
+      <div style="margin-top:8px;color:#9aabbf;font-size:12px;">2026.10.4</div>
+    </div>
+  `, [{text:'关闭', cls:'primary', fn: closeModal}]);
+};
   showModal('📅 打卡 & 学习报告', `
     <div class="checkin-grid" id="checkinGrid"></div>
     <div class="stat-row" style="margin-top:10px;">
@@ -2989,6 +3000,20 @@ document.getElementById('moreThemeBtn').onclick = ()=>{
   sfxClick();
   state.dark = !state.dark;
   document.body.classList.toggle('dark', state.dark); save();
+};
+document.getElementById('moreAchieveBtn').onclick = ()=>{
+  sfxClick();
+  const days = Object.keys(state.checkin).length;
+  const list = [
+    { name:'初次打卡', done: days>=1 },
+    { name:'坚持一周', done: calcStreak()>=7 },
+    { name:'半月不懈', done: calcStreak()>=15 },
+    { name:'月度达人', done: calcStreak()>=30 },
+    { name:'熟练 50', done: Object.keys(state.mastery).length>=50 },
+    { name:'熟练 200', done: Object.keys(state.mastery).length>=200 },
+    { name:'错题清零', done: Object.values(state.wrongBook).flat().length===0 }
+  ];
+  showModal('🏆 成就系统', list.map(a=>`<div class="group-row" style="${a.done?'':'opacity:.5'}"><div class="gname">${a.done?'🏆':'🔒'} ${a.name}</div></div>`).join(''), [{text:'关闭', cls:'primary', fn: closeModal}]);
 };
 document.getElementById('moreResetBtn').onclick = ()=>{
   if(!confirm('重置所有数据？不可恢复')) return;
