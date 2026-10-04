@@ -2202,7 +2202,7 @@ function buildGameQueue(){
   }else{
     const g = getGroup(); if(g) pool.push(...g.words);
   }
-  const filtered = pool.filter(w=>!state.mastery[w.en.toLowerCase()]);
+  const filtered = pool;
   const seen = new Set(); const out = [];
   filtered.forEach(w=>{ const k=w.en.toLowerCase(); if(!seen.has(k)){ seen.add(k); out.push(w); } });
   return out;
