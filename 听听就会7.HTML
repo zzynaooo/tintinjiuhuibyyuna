@@ -1784,27 +1784,34 @@ function openGroupWords(gid){
       </div>`;
     }).join('');
     listEl.querySelectorAll('[data-en]').forEach(el=>{
-  const w = g.words.find(x=>x.en===el.dataset.en);
-  el.addEventListener('click', (e)=>{
-    const rect = el.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const isLeftArea = clickX < rect.width * 0.55;
-    if(isLeftArea || e.target.classList.contains('wen')){
-      sfxClick(); speakWord(w.en); return;
-    }
-    sfxClick(); closeModal(); openWordDetail(w, g);
-  });
-  let lp;
-  el.addEventListener('touchstart', ()=>{ lp = setTimeout(()=>{
-    if(confirm('删除 '+w.en+'（'+(w.zh||'')+'）？')){
-      g.words = g.words.filter(x=>x.en!==w.en);
-      state.recycle.push({...w, fromBook:bk.id, fromGroup:g.id});
-      save(); renderList();
-    }
-  }, 700); });
-  el.addEventListener('touchend', ()=>clearTimeout(lp));
-  el.addEventListener('touchmove', ()=>clearTimeout(lp));
-});
+      const w = g.words.find(x=>x.en===el.dataset.en);
+      el.addEventListener('click', (e)=>{
+        const rect = el.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const isLeftArea = clickX < rect.width * 0.55;
+        if(isLeftArea || e.target.classList.contains('wen')){
+          sfxClick(); speakWord(w.en); return;
+        }
+        sfxClick();
+        // 记住滚动位置
+        sessionStorage.setItem('__scroll_'+g.id, listEl.scrollTop);
+        closeModal();
+        openWordDetail(w, g);
+      });
+      let lp;
+      el.addEventListener('touchstart', ()=>{ lp = setTimeout(()=>{
+        if(confirm('删除 '+w.en+'（'+(w.zh||'')+'）？')){
+          g.words = g.words.filter(x=>x.en!==w.en);
+          state.recycle.push({...w, fromBook:bk.id, fromGroup:g.id});
+          save(); renderList();
+        }
+      }, 700); });
+      el.addEventListener('touchend', ()=>clearTimeout(lp));
+      el.addEventListener('touchmove', ()=>clearTimeout(lp));
+    });
+    // 恢复滚动位置
+    const saved = sessionStorage.getItem('__scroll_'+g.id);
+    if(saved) requestAnimationFrame(()=>{ listEl.scrollTop = +saved; });
   }
   showModal('📂 '+g.name+'（'+g.words.length+' 词）', `
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
