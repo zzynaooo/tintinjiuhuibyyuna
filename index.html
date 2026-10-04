@@ -219,6 +219,7 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
           <button data-view="both" class="active">中英</button>
           <button data-view="en">英</button>
           <button data-view="zh">中</button>
+          <button data-view="none">全遮</button>
         </div>
         <button class="btn ghost sm" id="orderToggleBtn">➡️ 顺序</button>
         <button class="btn ghost sm" id="reviewWordsBtn">📋 本组</button>
@@ -1349,6 +1350,7 @@ function renderDictation(){
   else freqEl.style.display='none';
   if(state.viewMode==='en') zhEl.classList.add('hidden-txt');
   if(state.viewMode==='zh') enEl.classList.add('hidden-txt');
+  if(state.viewMode==='none'){ enEl.classList.add('hidden-txt'); zhEl.classList.add('hidden-txt'); }
 }
 function speakCurrent(){ const w = currentWord(); if(w) speakWord(w.en); }
 function playToggle(){
@@ -1549,7 +1551,6 @@ function openWordDetail(w, group){
       <div class="wd-example">
         <div class="ex-en">${buildClickableSentence(w.ex)}</div>
         <div class="ex-zh">${esc(w.exZh||'')}</div>
-        <div style="margin-top:6px;"><button class="btn ghost sm" id="speakEx">🔊 读整句</button></div>
       </div>`;
   }
   showModal('', `
@@ -1618,8 +1619,7 @@ function openWordDetail(w, group){
       save(); closeModal(); openWordDetail(w, group); toast('已更新');
     });
   };
-  const ex = document.getElementById('speakEx');
-  if(ex) ex.onclick = ()=>{ sfxClick(); speakSentence(w.ex); };
+  
   bindClickableWords(document.getElementById('modalBody'));
 }
 function buildClickableSentence(sentence){
@@ -2063,14 +2063,11 @@ async function doSearch(){
         <div class="sr-ex">
           <div class="ex-en">${esc(w.ex)}</div>
           <div class="ex-zh">${esc(w.exZh||'')}</div>
-          <div style="margin-top:6px;"><button class="btn ghost sm" id="srExSpeak">🔊 读整句</button></div>
         </div>
       `:''}
       <div style="font-size:12px;color:#9aabbf;margin-top:6px;">✅ 来自词书</div>
     `;
-    document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(w.en); };
-    const exBtn = document.getElementById('srExSpeak');
-    if(exBtn) exBtn.onclick = ()=>{ sfxClick(); speakSentence(w.ex); };
+  document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(w.en); };
     return;
   }
   box.innerHTML = `
@@ -2102,19 +2099,15 @@ async function doSearch(){
     <div class="sr-word">${esc(data.word)} <button class="btn ghost sm" id="srSpeak">🔊</button></div>
     ${data.phon?`<div class="sr-phon">${esc(data.phon)}</div>`:''}
     <div class="sr-def">${esc(data.def||'—')}</div>
-    ${(data.examples||[]).map((ex,i)=>`
+    ${(data.examples||[]).map((ex)=>`
       <div class="sr-ex">
         <div class="ex-en">${esc(ex.en)}</div>
         <div class="ex-zh">${esc(ex.zh||'')}</div>
-        <div style="margin-top:6px;"><button class="btn ghost sm" data-sx="${i}">🔊 读整句</button></div>
       </div>
     `).join('')}
     <div style="font-size:12px;color:#9aabbf;margin-top:6px;">🌐 来自联网（有道）</div>
   `;
   document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(data.word); };
-  box.querySelectorAll('[data-sx]').forEach(b=>{
-    b.onclick = ()=>{ sfxClick(); speakSentence(data.examples[+b.dataset.sx].en); };
-  });
 }
 function parseYoudao(json, q){
   try{
