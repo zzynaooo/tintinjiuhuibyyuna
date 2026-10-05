@@ -2897,15 +2897,6 @@ document.getElementById('moreNoticeBtn').onclick = ()=>{
     </div>
   `, [{text:'关闭', cls:'primary', fn: closeModal}]);
 };
-    const bk = getBook();
-    let total=0, star=0, wrong=0;
-    bk.groups.forEach(g=>g.words.forEach(w=>{ total++; if(state.mastery[w.en.toLowerCase()]) star++; }));
-    Object.values(state.wrongBook).forEach(arr=>wrong += arr.length);
-    document.getElementById('reportBox').innerHTML = `
-      <div class="stat-row"><div class="stat"><div class="snum">${total}</div><div class="slbl">总词数</div></div><div class="stat"><div class="snum">${star}</div><div class="slbl">熟练</div></div><div class="stat"><div class="snum">${wrong}</div><div class="slbl">错题</div></div></div>
-    `;
-  });
-};
 document.getElementById('moreArchiveBtn').onclick = ()=>{
   sfxClick();
   showModal('☁️ 存档管理', `
