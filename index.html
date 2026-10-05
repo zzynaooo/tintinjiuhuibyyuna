@@ -219,6 +219,7 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
           <button data-view="both" class="active">中英</button>
           <button data-view="en">英</button>
           <button data-view="zh">中</button>
+          <button data-view="none">全遮</button>
         </div>
         <button class="btn ghost sm" id="orderToggleBtn">➡️ 顺序</button>
         <button class="btn ghost sm" id="reviewWordsBtn">📋 本组</button>
@@ -402,7 +403,6 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
         <div class="card-title"><span>⚙️ 更多功能</span></div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <button class="btn ghost" id="moreNoticeBtn" style="justify-content:flex-start;">📢 更新公告</button>
-          <button class="btn ghost" id="moreCheckinBtn" style="justify-content:flex-start;">📅 打卡 & 学习报告</button>
           <button class="btn ghost" id="moreArchiveBtn" style="justify-content:flex-start;">☁️ 存档管理</button>
           <button class="btn ghost" id="moreExportWrongBtn" style="justify-content:flex-start;">📤 导出错题本</button>
           <button class="btn ghost" id="moreThemeBtn" style="justify-content:flex-start;">🌙 深色模式</button>
@@ -1307,16 +1307,6 @@ function updateOverlayInfo(){
   if(b) b.onclick = ()=>{ sfxClick(); stopDetailLoop(); toast('已停止'); };
 }
 
-/* ===== 打卡写入 ===== */
-function bumpCheckin(){
-  const ds = todayStr();
-  if(!state.checkin[ds]) state.checkin[ds] = { words:0 };
-  state.checkin[ds].words = (state.checkin[ds].words||0) + 1;
-  const bk = getBook(); const g = getGroup();
-  if(bk && g) state.checkedGroups[bk.name+' › '+g.name] = true;
-  save();
-}
-
 /* ===== 听写主流程 ===== */
 function currentPlayList(){
   const g = getGroup();
@@ -1358,6 +1348,7 @@ function renderDictation(){
   else freqEl.style.display='none';
   if(state.viewMode==='en') zhEl.classList.add('hidden-txt');
   if(state.viewMode==='zh') enEl.classList.add('hidden-txt');
+  if(state.viewMode==='none'){ enEl.classList.add('hidden-txt'); zhEl.classList.add('hidden-txt'); }
 }
 function speakCurrent(){ const w = currentWord(); if(w) speakWord(w.en); }
 function playToggle(){
@@ -1437,7 +1428,6 @@ function toggleOrder(){
 }
 function markWrong(){
   const w = currentWord(); if(!w){ toast('无单词'); return; }
-  bumpCheckin();
   state.gameUnknown.push(w);
   if(state.askOnMark) askFolderFor(w); else addWrongAuto(w);
   sfxWrong();
@@ -1452,7 +1442,6 @@ function markStar(){
   Object.keys(state.wrongBook).forEach(f=>{
     state.wrongBook[f] = state.wrongBook[f].filter(x=>x.en.toLowerCase()!==w.en.toLowerCase());
   });
-  bumpCheckin();
   save(); sfxCorrect(); toast('✓ 已标熟练');
   if(state.currentIndex < currentPlayList().length-1){
     state.currentIndex++; renderDictation();
@@ -2213,9 +2202,8 @@ function buildGameQueue(){
   }else{
     const g = getGroup(); if(g) pool.push(...g.words);
   }
-  const filtered = pool.filter(w=>!state.mastery[w.en.toLowerCase()]);
   const seen = new Set(); const out = [];
-  filtered.forEach(w=>{ const k=w.en.toLowerCase(); if(!seen.has(k)){ seen.add(k); out.push(w); } });
+  pool.forEach(w=>{ const k=w.en.toLowerCase(); if(!seen.has(k)){ seen.add(k); out.push(w); } });
   return out;
 }
 function endGame(score, extra, extraLabel){
@@ -2909,34 +2897,6 @@ document.getElementById('moreNoticeBtn').onclick = ()=>{
     </div>
   `, [{text:'关闭', cls:'primary', fn: closeModal}]);
 };
-  document.getElementById('moreCheckinBtn').onclick = ()=>{
-  sfxClick();
-  showModal('📅 打卡 & 学习报告', `
-    <div class="checkin-grid" id="checkinGrid"></div>
-    <div class="stat-row" style="margin-top:10px;">
-      <div class="stat"><div class="snum" id="statTotal">0</div><div class="slbl">累计天数</div></div>
-      <div class="stat"><div class="snum" id="statStreak">0</div><div class="slbl">连续天数</div></div>
-      <div class="stat"><div class="snum" id="statGroups">0</div><div class="slbl">今日词数</div></div>
-    </div>
-    <div style="margin-top:10px;font-size:14px;color:#5a6f88;">今日目标：<input type="number" id="todayGoal" min="1" value="${state.todayGoal}" style="width:80px;min-height:40px;padding:6px 10px;font-size:15px;display:inline-block;"> 词</div>
-    <div style="font-size:13px;color:#7a8fa8;margin-top:6px;" id="todayInfo"></div>
-    <div class="card-title" style="margin-top:14px;">📊 学习报告</div>
-    <div id="reportBox"></div>
-  `, [{text:'关闭', cls:'primary', fn: closeModal}], ()=>{
-    renderCheckin();
-    const today = todayStr();
-    document.getElementById('statTotal').textContent = Object.keys(state.checkin).length;
-    document.getElementById('statStreak').textContent = calcStreak();
-    let tw = 0;
-    if(state.checkin[today]) tw = state.checkin[today].words||0;
-    document.getElementById('statGroups').textContent = tw;
-    const extra = tw > state.todayGoal ? '（超额 '+(tw-state.todayGoal)+'）' : '';
-    document.getElementById('todayInfo').textContent = '今日已学 '+tw+' 词 / 目标 '+state.todayGoal+' 词 '+extra;
-    document.getElementById('todayGoal').onchange = (e)=>{
-      state.todayGoal = Math.max(1, +e.target.value||20); save();
-      const ex = tw > state.todayGoal ? '（超额 '+(tw-state.todayGoal)+'）' : '';
-      document.getElementById('todayInfo').textContent = '今日已学 '+tw+' 词 / 目标 '+state.todayGoal+' 词 '+ex;
-    };
     const bk = getBook();
     let total=0, star=0, wrong=0;
     bk.groups.forEach(g=>g.words.forEach(w=>{ total++; if(state.mastery[w.en.toLowerCase()]) star++; }));
