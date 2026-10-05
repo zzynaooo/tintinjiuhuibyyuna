@@ -1199,24 +1199,33 @@ document.addEventListener('click', unlockAudio, {once:true});
 function speakWord(word, cb){
   if(!word){ if(cb) cb(); return; }
   if(state.listenMode==='off'){ if(cb) setTimeout(cb, 200); return; }
-  const url = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(word) + '&type=1';
+
   let finished = false;
   const done = ()=>{ if(finished) return; finished = true; if(cb) cb(); };
-  try{
-    const audio = new Audio(url);
-    audio.preload = 'auto';
-    audio.onerror = ()=>{ fallbackSpeak(word, done); };
-    const timer = setTimeout(()=>{
-      if(finished) return;
-      try{ audio.pause(); }catch(e){}
-      fallbackSpeak(word, done);
-    }, 3000);
-    audio.onended = ()=>{ clearTimeout(timer); done(); };
-    audio.play().catch(()=>{
-      clearTimeout(timer);
-      fallbackSpeak(word, done);
-    });
-  }catch(e){ fallbackSpeak(word, done); }
+
+  // 真人音源（有道），两个 type 依次试
+  const srcs = [
+    'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(word) + '&type=2',
+    'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(word) + '&type=1'
+  ];
+
+  let idx = 0;
+  function tryNext(){
+    if(finished) return;
+    if(idx >= srcs.length){ fallbackSpeak(word, done); return; }
+    const url = srcs[idx++];
+    let played = false;
+    try{
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      audio.onended = ()=>{ played = true; done(); };
+      audio.onerror = ()=>{ if(!played) tryNext(); };
+      audio.play().then(()=>{ played = true; }).catch(()=>{ tryNext(); });
+      // 关键：2 秒内没播出来，换下一个
+      setTimeout(()=>{ if(!played && !finished) tryNext(); }, 2000);
+    }catch(e){ tryNext(); }
+  }
+  tryNext();
 }
 function fallbackSpeak(word, done){
   if(!('speechSynthesis' in window)){ if(done) done(); return; }
@@ -2110,10 +2119,6 @@ async function doSearch(){
     `).join('')}
     <div style="font-size:12px;color:#9aabbf;margin-top:6px;">🌐 来自联网（有道）</div>
   `;
-  document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(data.word); };
-  box.querySelectorAll('[data-sx]').forEach(b=>{
-    b.onclick = ()=>{ sfxClick(); speakSentence(data.examples[+b.dataset.sx].en); };
-  });
 }
 function parseYoudao(json, q){
   try{
