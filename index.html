@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>听听就会</title>
+<title>听听就会 · 专升本500词听写助手</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 html,body{height:100%;overflow:hidden;}
@@ -56,8 +56,8 @@ body.dark .empty{color:#5a7088;}
 .word-phon{font-size:16px;color:#7a8fa8;margin-top:8px;font-weight:500;transition:filter .2s;}
 .word-freq{display:inline-block;margin-top:10px;background:linear-gradient(135deg,#ff6b35,#f7b731);color:#fff;font-weight:800;font-size:15px;padding:6px 16px;border-radius:30px;box-shadow:0 6px 14px -6px rgba(247,183,49,.6);}
 .hidden-txt{filter:blur(12px);opacity:.45;pointer-events:none;}
-.mask-en .wen{filter:blur(12px);opacity:.4;}
-.mask-zh .wzh{filter:blur(12px);opacity:.4;}
+.mask-en .wzh{filter:blur(12px);opacity:.4;}
+.mask-zh .wen{filter:blur(12px);opacity:.4;}
 .progress-tag{position:absolute;top:14px;left:14px;font-size:14px;color:#5a6f88;background:#eef3fa;padding:6px 14px;border-radius:20px;font-weight:600;}
 .pron-btn{position:absolute;top:14px;right:14px;width:54px;height:54px;border-radius:50%;background:#2d4b6e;color:#fff;border:none;font-size:22px;cursor:pointer;box-shadow:0 6px 16px -6px rgba(45,75,110,.6);transition:all .12s;touch-action:manipulation;display:flex;align-items:center;justify-content:center;}
 .pron-btn:active{transform:scale(.92);}
@@ -86,7 +86,7 @@ body.dark .empty{color:#5a7088;}
 .wrow .wzh{font-size:15px;color:#5a6f88;flex:1;text-align:right;word-break:normal;line-height:1.3;transition:filter .2s;}
 .wrow.mark-wrong{background:#fffafa;border-color:#f5dada;}
 .wrow.mark-wrong .wen{color:#c04545;}
-.word-detail-card{background:#fff;border-radius:14px;padding:24px;border:1.5px solid #e6eef9;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;position:relative;}
+.word-detail-card{background:#fff;border-radius:22px;padding:24px;border:1.5px solid #e6eef9;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;position:relative;}
 .wd-en{font-size:clamp(26px,7vw,34px);font-weight:800;color:#1e3a5f;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-right:50px;word-break:keep-all;line-height:1.2;cursor:pointer;transition:opacity .15s;}
 .wd-en:active{opacity:.6;}
 .wd-phon{font-size:16px;color:#7a8fa8;font-weight:500;}
@@ -219,7 +219,6 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
           <button data-view="both" class="active">中英</button>
           <button data-view="en">英</button>
           <button data-view="zh">中</button>
-          <button data-view="none">全遮</button>
         </div>
         <button class="btn ghost sm" id="orderToggleBtn">➡️ 顺序</button>
         <button class="btn ghost sm" id="reviewWordsBtn">📋 本组</button>
@@ -399,18 +398,8 @@ textarea{resize:vertical;min-height:160px;line-height:1.8;}
     </div>
 
     <div class="page" id="page-more">
-  <div class="card" style="flex:0 0 auto;padding:14px 18px;">
-    <div class="card-title"><span>📢 更新公告</span></div>
-    <div style="font-size:13px;color:#5a6f88;line-height:1.9;">
-      <div>• 修复词书"遮英文 / 遮中文"反向的问题</div>
-      <div>• 单词列表左半边点击可发音，右半边点击进详情</div>
-      <div>• 单词详情页圆角调整，不再遮挡单词</div>
-      <div>• 单词堡垒每组词自动乱序</div>
-      <div style="margin-top:6px;color:#9aabbf;font-size:12px;">2026.10.4</div>
-    </div>
-  </div>
-  <div class="card" style="flex:1;overflow-y:auto;">
-    <div class="card-title"><span>⚙️ 更多功能</span></div>
+      <div class="card" style="flex:1;overflow-y:auto;">
+        <div class="card-title"><span>⚙️ 更多功能</span></div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <button class="btn ghost" id="moreCheckinBtn" style="justify-content:flex-start;">📅 打卡 & 学习报告</button>
           <button class="btn ghost" id="moreArchiveBtn" style="justify-content:flex-start;">☁️ 存档管理</button>
@@ -1093,7 +1082,7 @@ function buildDefaultBook(){
     }
     if(words.length) groups.push({ id:'g'+(i+1), name:'第'+(i+1)+'组', words });
   }
-  return { id:'book_default', name:'专升本高频500词', groups };
+  return { id:'book_default', name:'专升本500词', groups };
 }
 
 let state = {
@@ -1360,7 +1349,6 @@ function renderDictation(){
   else freqEl.style.display='none';
   if(state.viewMode==='en') zhEl.classList.add('hidden-txt');
   if(state.viewMode==='zh') enEl.classList.add('hidden-txt');
-  if(state.viewMode==='none'){ enEl.classList.add('hidden-txt'); zhEl.classList.add('hidden-txt'); }
 }
 function speakCurrent(){ const w = currentWord(); if(w) speakWord(w.en); }
 function playToggle(){
@@ -1561,6 +1549,7 @@ function openWordDetail(w, group){
       <div class="wd-example">
         <div class="ex-en">${buildClickableSentence(w.ex)}</div>
         <div class="ex-zh">${esc(w.exZh||'')}</div>
+        <div style="margin-top:6px;"><button class="btn ghost sm" id="speakEx">🔊 读整句</button></div>
       </div>`;
   }
   showModal('', `
@@ -1629,7 +1618,8 @@ function openWordDetail(w, group){
       save(); closeModal(); openWordDetail(w, group); toast('已更新');
     });
   };
-  
+  const ex = document.getElementById('speakEx');
+  if(ex) ex.onclick = ()=>{ sfxClick(); speakSentence(w.ex); };
   bindClickableWords(document.getElementById('modalBody'));
 }
 function buildClickableSentence(sentence){
@@ -1783,27 +1773,22 @@ function openGroupWords(gid){
       </div>`;
     }).join('');
     listEl.querySelectorAll('[data-en]').forEach(el=>{
-  const w = g.words.find(x=>x.en===el.dataset.en);
-  el.addEventListener('click', (e)=>{
-    const rect = el.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const isLeftArea = clickX < rect.width * 0.55;
-    if(isLeftArea || e.target.classList.contains('wen')){
-      sfxClick(); speakWord(w.en); return;
-    }
-    sfxClick(); closeModal(); openWordDetail(w, g);
-  });
-  let lp;
-  el.addEventListener('touchstart', ()=>{ lp = setTimeout(()=>{
-    if(confirm('删除 '+w.en+'（'+(w.zh||'')+'）？')){
-      g.words = g.words.filter(x=>x.en!==w.en);
-      state.recycle.push({...w, fromBook:bk.id, fromGroup:g.id});
-      save(); renderList();
-    }
-  }, 700); });
-  el.addEventListener('touchend', ()=>clearTimeout(lp));
-  el.addEventListener('touchmove', ()=>clearTimeout(lp));
-});
+      const w = g.words.find(x=>x.en===el.dataset.en);
+      el.addEventListener('click', (e)=>{
+        if(e.target.classList.contains('wen')){ sfxClick(); speakWord(w.en); return; }
+        sfxClick(); closeModal(); openWordDetail(w, g);
+      });
+      let lp;
+      el.addEventListener('touchstart', ()=>{ lp = setTimeout(()=>{
+        if(confirm('删除 '+w.en+'（'+(w.zh||'')+'）？')){
+          g.words = g.words.filter(x=>x.en!==w.en);
+          state.recycle.push({...w, fromBook:bk.id, fromGroup:g.id});
+          save(); renderList();
+        }
+      }, 700); });
+      el.addEventListener('touchend', ()=>clearTimeout(lp));
+      el.addEventListener('touchmove', ()=>clearTimeout(lp));
+    });
   }
   showModal('📂 '+g.name+'（'+g.words.length+' 词）', `
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
@@ -2078,11 +2063,14 @@ async function doSearch(){
         <div class="sr-ex">
           <div class="ex-en">${esc(w.ex)}</div>
           <div class="ex-zh">${esc(w.exZh||'')}</div>
+          <div style="margin-top:6px;"><button class="btn ghost sm" id="srExSpeak">🔊 读整句</button></div>
         </div>
       `:''}
       <div style="font-size:12px;color:#9aabbf;margin-top:6px;">✅ 来自词书</div>
     `;
-  document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(w.en); };
+    document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(w.en); };
+    const exBtn = document.getElementById('srExSpeak');
+    if(exBtn) exBtn.onclick = ()=>{ sfxClick(); speakSentence(w.ex); };
     return;
   }
   box.innerHTML = `
@@ -2114,15 +2102,19 @@ async function doSearch(){
     <div class="sr-word">${esc(data.word)} <button class="btn ghost sm" id="srSpeak">🔊</button></div>
     ${data.phon?`<div class="sr-phon">${esc(data.phon)}</div>`:''}
     <div class="sr-def">${esc(data.def||'—')}</div>
-    ${(data.examples||[]).map((ex)=>`
+    ${(data.examples||[]).map((ex,i)=>`
       <div class="sr-ex">
         <div class="ex-en">${esc(ex.en)}</div>
         <div class="ex-zh">${esc(ex.zh||'')}</div>
+        <div style="margin-top:6px;"><button class="btn ghost sm" data-sx="${i}">🔊 读整句</button></div>
       </div>
     `).join('')}
     <div style="font-size:12px;color:#9aabbf;margin-top:6px;">🌐 来自联网（有道）</div>
   `;
   document.getElementById('srSpeak').onclick = ()=>{ sfxClick(); speakWord(data.word); };
+  box.querySelectorAll('[data-sx]').forEach(b=>{
+    b.onclick = ()=>{ sfxClick(); speakSentence(data.examples[+b.dataset.sx].en); };
+  });
 }
 function parseYoudao(json, q){
   try{
@@ -2217,7 +2209,7 @@ function buildGameQueue(){
   }else{
     const g = getGroup(); if(g) pool.push(...g.words);
   }
-  const filtered = pool;
+  const filtered = pool.filter(w=>!state.mastery[w.en.toLowerCase()]);
   const seen = new Set(); const out = [];
   filtered.forEach(w=>{ const k=w.en.toLowerCase(); if(!seen.has(k)){ seen.add(k); out.push(w); } });
   return out;
@@ -2408,8 +2400,7 @@ let towerState = null;
 function startTowerGame(){
   const q = buildGameQueue();
   if(!q.length){ toast('没有可用的单词'); return; }
-  const shuffled = q.slice().sort(()=>Math.random()-.5);
-  towerState = { queue:shuffled, idx:0, wave:1, score:0, lives:3, enemyTop:0,
+  towerState = { queue:q, idx:0, wave:1, score:0, lives:3, enemyTop:0,
     currentWord:null, options:[], running:true, timer:null, difficulty:'normal', wrongCount:0, attempt:0 };
   state.gameKnown = []; state.gameUnknown = [];
   document.getElementById('gameTitle').textContent = '🛡️ 单词堡垒';
